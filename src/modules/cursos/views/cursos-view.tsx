@@ -5,6 +5,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Screen } from '@/components/ui/screen';
 import { InfoRow, MediaPlaceholder } from '@/components/ui/style-guide';
+import { InscripcionForm } from './inscripcion-form';
 import { EmptyState, ErrorState, LoadingState } from '@/components/feedback/async-states';
 import { Spacing } from '@/theme';
 import { useCursosViewModel } from '@/modules/cursos/viewmodels/use-cursos-view-model';
@@ -30,6 +31,7 @@ export default function CoursesScreen() {
         {informacion.map((item) => <InfoRow key={item.label} {...item} />)}
       </View>
       <ThemedView surface="card"><InfoRow label="Precio" value={precio} accent /></ThemedView>
+      <InscripcionForm curso={curso} />
     </Screen>
   );
 }

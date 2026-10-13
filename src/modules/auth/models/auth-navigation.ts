@@ -1,4 +1,4 @@
-const protectedPaths = ['/cuenta/cerrar-sesion'];
+const protectedPaths = ['/cuenta/cursos', '/cuenta/cerrar-sesion'];
 export function isProtectedPath(pathname: string): boolean { return protectedPaths.some(path => pathname === path || pathname.startsWith(path + '/')); }
 export function loginDestination(value: string | string[] | undefined): string {
  const fallback = '/';

@@ -3,6 +3,7 @@ import { Redirect, useLocalSearchParams } from 'expo-router';
 import { LoadingState } from '@/components/feedback/async-states';
 import { Screen } from '@/components/ui/screen';
 import { AutenticacionSeccionView } from '@/modules/auth/views/autenticacion-seccion-view';
+import { MisCursosView } from '@/modules/cursos/views/mis-cursos-view';
 import type { DestinoCuenta } from '@/modules/cuenta/viewmodels/cuenta-state';
 import { useCuentaViewModel } from '@/modules/cuenta/viewmodels/use-cuenta-view-model';
 import { loginDestination } from '@/modules/auth/models/auth-navigation';
@@ -22,6 +23,7 @@ export default function CuentaView() {
 
 function ContenidoCuenta({ destino }: { destino: DestinoCuenta }) {
   switch (destino.modulo) {
+    case 'cursos': return <MisCursosView />;
     case 'autenticacion': return <AutenticacionSeccionView key={destino.seccion} seccion={destino.seccion} />;
     case 'vacia': return null;
   }

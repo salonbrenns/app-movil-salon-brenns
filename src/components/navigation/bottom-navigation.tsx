@@ -14,7 +14,7 @@ export function BottomNavigation() {
   const theme = useTheme();
   if (!showsBottomNavigation(pathname)) return null;
   const activeHref = ['/catalogo', '/cursos'].includes(pathname) ? '/catalogo'
-    : pathname === '/agenda' ? '/agenda' : pathname === '/perfil' ? '/perfil' : '/';
+    : pathname === '/agenda' ? '/agenda' : pathname === '/perfil' ? '/perfil' : pathname.startsWith('/cuenta/') ? '/cuenta/cursos' : '/';
 
   return (
     <SafeAreaView edges={['left', 'right', 'bottom']} style={[styles.surface, { backgroundColor: theme.backgroundElement, borderTopColor: theme.border }]}>

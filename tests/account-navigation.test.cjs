@@ -22,3 +22,9 @@ test('private account content waits for restoration and redirects only within it
 test('unknown account sections remain neutral instead of exposing protected content', () => {
  seccion = 'desconocida'; status = 'anonymous'; const result=CuentaView(); assert.equal(result.type,'Screen'); assert.equal(result.props.children.props.destino.modulo,'vacia');
 });
+
+test('Mis cursos requires a confirmed session before rendering its account section', () => {
+ seccion = 'cursos'; status = 'loading'; let result=CuentaView(); assert.equal(result.props.children.type,'LoadingState');
+ status = 'anonymous'; result=CuentaView(); assert.equal(result.type,'Redirect'); assert.equal(result.props.href.params.returnTo,'/cuenta/cursos');
+ status = 'authenticated'; result=CuentaView(); assert.equal(result.type,'Screen'); assert.equal(result.props.children.props.destino.modulo,'cursos');
+});

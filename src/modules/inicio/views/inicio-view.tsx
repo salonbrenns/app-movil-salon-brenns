@@ -10,6 +10,7 @@ export default function InicioView() {
  return <Screen title="Salón Brenn’s" subtitle="Selecciona una sección.">
   {vm.autenticado ? <ThemedText type="subtitle">{vm.saludo}</ThemedText> : null}
   <ThemedView surface="card">{Object.values(NavigationSections).map(section => <Link key={section.name} href={section.href} asChild><Button label={section.title} variant="secondary" /></Link>)}</ThemedView>
+  {vm.autenticado ? <Link href="/cuenta/cursos" asChild><Button label="Ver mis cursos" /></Link> : null}
   {vm.autenticado ? <Link href="/cuenta/cerrar-sesion" asChild><Button label="Cerrar sesión" variant="secondary" /></Link> : null}
  </Screen>;
 }

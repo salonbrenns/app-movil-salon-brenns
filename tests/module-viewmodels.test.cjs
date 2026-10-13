@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
+const { HttpInscripcionesService } = require('@/modules/cursos/services/inscripciones-service');
 const { FetchHttpClient, HttpError } = require('@/services/api');
 const { AdapterError, ModelNotFoundError } = require('@/shared/adapters/adapter-error');
 const { HttpCursosService } = require('@/modules/cursos/services/cursos-service');
@@ -54,4 +55,12 @@ test('included login destinations retain the common routes and reject unimplemen
  for (const p of ['/', '/catalogo?categoria=Cursos&q=color', '/cursos?id=7', '/agenda', '/servicios', '/perfil', '/cuenta/cerrar-sesion']) assert.equal(loginDestination(p),p);
  for (const p of ['/carrito', '/productos/1', '/cuenta/compras', '/autenticacion', '//evil.invalid', 'https://evil.invalid', '/cursos#fragment', '/cuenta/cursos/extra']) assert.equal(loginDestination(p), '/');
  assert.equal(isProtectedPath('/cuenta/cerrar-sesion'),true); assert.equal(isProtectedPath('/cursos'),false); assert.equal(isProtectedPath('/cuenta/crear-cuenta'),false);
+});
+
+test('Mis cursos displays only server-reported payment states and accepts a missing public course', async () => {
+ const row = { inscripcionId: 7, estado: 'ACTIVO', fecha_inscripcion: '2026-01-01T12:00:00Z', diasAsistidos: 2, totalPagado: 0, curso: { id: 2, titulo: 'Curso publicado', precio_total: 250 }, pagos: [{ id: 9, monto: 250, estado: 'PENDIENTE' }] };
+ const service = new HttpInscripcionesService(fixture({ cursos: [row, {...row, inscripcionId: 8, curso: null}] }).http);
+ const result = await service.listar(); assert.equal(result[0].totalPagado, '0'); assert.equal(result[0].pagos[0].estado, 'PENDIENTE'); assert.equal(result[1].cursoId,null);
+ await assert.rejects(new HttpInscripcionesService(fixture(null,204).http).listar(), AdapterError);
+ for (const reply of [{success:true}, {success:true, inscripcionId:7, pagoId:9, monto:250, tipoPago:'ANTICIPO', metodoPago:'TRANSFERENCIA'}, {success:true, inscripcionId:7, pagoId:9, monto:250, tipoPago:'COMPLETO', metodoPago:'TARJETA'}]) await assert.rejects(new HttpInscripcionesService(fixture(reply).http).inscribir('7'));
 });
