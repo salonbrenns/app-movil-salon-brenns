@@ -2,6 +2,9 @@ import '@/global.css';
 
 export const Colors = {
   primary: '#ED4087',
+  primarySoft: '#FFE8F2',
+  inactive: '#8E888D',
+  success: '#329D6A',
   text: '#000000',
   textSecondary: '#60646C',
   background: '#ffffff',
@@ -34,12 +37,13 @@ export const Radius = {
 } as const;
 
 export const Sizes = {
-  text: { title: 28, subtitle: 20, body: 16, small: 14, code: 12 },
-  lineHeight: { title: 36, subtitle: 28, body: 24, small: 20, code: 18 },
+  text: { title: 28, subtitle: 20, body: 16, small: 14, code: 12, tab: 10 },
+  lineHeight: { title: 36, subtitle: 28, body: 24, small: 20, code: 18, tab: 16 },
   controlMinHeight: 48,
   touchMinWidth: 44,
   borderWidth: 1,
   maxContentWidth: 800,
+  mediaHero: 180, mediaThumbnail: 72, mediaCardHeight: 88, categoryMinHeight: 88, avatar: 56, tabBarMinHeight: 64,
 } as const;
 
 // Use small icons inline, medium icons in controls, and large icons for emphasis.
@@ -70,6 +74,8 @@ export const Typography = {
   label: { ...boldText, fontSize: Sizes.text.small, lineHeight: Sizes.lineHeight.small },
   action: { ...boldText, fontSize: Sizes.text.body, lineHeight: Sizes.lineHeight.body },
   link: { ...boldText, fontSize: Sizes.text.small, lineHeight: Sizes.lineHeight.body },
+  auxiliary: { ...regularText, fontSize: Sizes.text.code, lineHeight: Sizes.lineHeight.code },
+  tab: { ...boldText, fontSize: Sizes.text.tab, lineHeight: Sizes.lineHeight.tab },
   code: { ...regularText, fontSize: Sizes.text.code, lineHeight: Sizes.lineHeight.code },
 } as const;
 

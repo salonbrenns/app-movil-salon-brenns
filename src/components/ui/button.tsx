@@ -1,5 +1,5 @@
-import { forwardRef } from 'react';
-import { Pressable, StyleSheet, type PressableProps, type View } from 'react-native';
+import { forwardRef, type ReactNode } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, type PressableProps, type View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ControlStates, Radius, Sizes, Spacing, Surfaces, Typography } from '@/constants/theme';
@@ -8,14 +8,17 @@ import { useTheme } from '@/hooks/use-theme';
 export type ButtonProps = PressableProps & {
   label: string;
   variant?: 'primary' | 'secondary';
+  loading?: boolean;
+  icon?: ReactNode;
 };
 
 export const Button = forwardRef<View, ButtonProps>(function Button(
-  { label, variant = 'primary', disabled, style, accessibilityState, ...props },
+  { label, variant = 'primary', loading = false, icon, disabled: disabledProp, style, accessibilityState, ...props },
   ref,
 ) {
   const theme = useTheme();
   const primary = variant === 'primary';
+  const disabled = !!disabledProp || loading;
 
   return (
     <Pressable
@@ -24,7 +27,7 @@ export const Button = forwardRef<View, ButtonProps>(function Button(
       accessibilityLabel={label}
       {...props}
       disabled={disabled}
-      accessibilityState={{ ...accessibilityState, disabled: !!disabled }}
+      accessibilityState={{ ...accessibilityState, disabled: !!disabled, busy: loading }}
       style={(state) => [
         styles.button,
         {
@@ -42,9 +45,9 @@ export const Button = forwardRef<View, ButtonProps>(function Button(
         },
         typeof style === 'function' ? style(state) : style,
       ]}>
-      <ThemedText themeColor={primary ? 'onPrimary' : 'primary'} style={styles.label}>
+      {icon}{loading ? <ActivityIndicator color={primary ? theme.onPrimary : theme.primary} /> : <ThemedText themeColor={primary ? 'onPrimary' : 'primary'} style={styles.label}>
         {label}
-      </ThemedText>
+      </ThemedText>}
     </Pressable>
   );
 });
@@ -65,3 +68,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
+export { Button as CustomButton };

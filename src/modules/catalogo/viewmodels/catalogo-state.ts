@@ -14,7 +14,7 @@ export type TarjetaCatalogo = Readonly<{
   title: string;
   description?: string;
   price: string;
-  kind: 'service' | 'course';
+  kind: 'service' | 'course' | 'product';
   href?: Href;
   image?: JsonValue;
 }>;

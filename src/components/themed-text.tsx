@@ -4,7 +4,7 @@ import { Typography, type ThemeColor } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 export type ThemedTextProps = TextProps & {
-  type?: 'default' | 'title' | 'small' | 'smallBold' | 'subtitle' | 'link' | 'linkPrimary' | 'code';
+  type?: 'default' | 'title' | 'small' | 'smallBold' | 'subtitle' | 'link' | 'linkPrimary' | 'code' | 'label' | 'action' | 'auxiliary';
   themeColor?: ThemeColor;
 };
 
@@ -25,6 +25,9 @@ export function ThemedText({ style, type = 'default', themeColor, ...rest }: The
         type === 'link' && styles.link,
         type === 'linkPrimary' && styles.linkPrimary,
         type === 'code' && styles.code,
+        type === 'label' && styles.label,
+        type === 'action' && styles.action,
+        type === 'auxiliary' && styles.auxiliary,
         style,
       ]}
       {...rest}
@@ -33,6 +36,7 @@ export function ThemedText({ style, type = 'default', themeColor, ...rest }: The
 }
 
 const styles = StyleSheet.create({
+  label: Typography.label, action: Typography.action, auxiliary: Typography.auxiliary,
   small: Typography.small,
   smallBold: Typography.smallBold,
   default: Typography.body,

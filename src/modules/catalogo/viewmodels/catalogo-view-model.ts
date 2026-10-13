@@ -7,5 +7,6 @@ export class CatalogoViewModel extends LoadState<DatosCatalogo> {
     super({ Servicios: [], Cursos: [], Productos: [] }, 'cargando');
   }
 
-  cargar = (signal?: AbortSignal) => this.load(() => this.service.obtener({ signal }));
+  cargar = (signal?: AbortSignal) =>
+    this.load(() => this.service.obtener({ signal }));
 }

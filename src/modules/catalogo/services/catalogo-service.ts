@@ -19,8 +19,11 @@ export class ComposedCatalogoService implements CatalogoService {
 
   async obtener(options?: RequestOptions): Promise<DatosCatalogo> {
     const [Servicios, Cursos, Productos] = await Promise.all([
-      this.servicios.listar(options), this.cursos.listar(options), this.productos.listar(options),
+      this.servicios.listar(options),
+      this.cursos.listar(options),
+      this.productos.listar(options),
     ]);
+
     return { Servicios, Cursos, Productos };
   }
 }
