@@ -1,7 +1,7 @@
 import type { EstadoModulo } from '@/shared/models/view-state';
 import type { CamposAutenticacion } from '../models/autenticacion';
 
-export const SECCIONES_AUTENTICACION = ['cerrar-sesion'] as const;
+export const SECCIONES_AUTENTICACION = ['crear-cuenta', 'verificar-email', 'cerrar-sesion'] as const;
 
 export type SeccionAutenticacion = (typeof SECCIONES_AUTENTICACION)[number];
 

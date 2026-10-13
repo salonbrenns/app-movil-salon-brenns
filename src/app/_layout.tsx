@@ -71,6 +71,7 @@ function AppShell() {
             <Stack.Screen key={section.name} name={section.name} options={{ title: section.title }} />
           ))}
           <Stack.Screen name="+not-found" options={{ title: 'Página no encontrada' }} />
+          <Stack.Screen name="verificar-email" options={{ title: 'Verificar correo' }} />
           <Stack.Screen name="cuenta/[seccion]" options={{ title: 'Mi cuenta' }} />
         </Stack>
         <BottomNavigation />
