@@ -9,4 +9,14 @@ export const NavigationSections = {
   profile: { name: 'perfil', href: '/perfil', title: 'Perfil' },
 } as const satisfies Record<string, { name: string; href: Href; title: string }>;
 
-export function showsBottomNavigation(_pathname: string) { return false; }
+export const BottomNavigationItems = [
+ { href: '/', label: 'Inicio', icon: 'home' },
+ { href: '/catalogo', label: 'Catálogo', icon: 'catalog' },
+ { href: '/agenda', label: 'Agenda', icon: 'agenda' },
+
+ { href: '/perfil', label: 'Perfil', icon: 'profile' },
+] as const satisfies readonly { href: Href; label: string; icon: string }[];
+export function showsBottomNavigation(pathname: string) {
+ if (['/autenticacion', '/verificar-email', '/cuenta/crear-cuenta', '/cuenta/verificar-email'].includes(pathname)) return false;
+ return pathname === '/' || Object.values(NavigationSections).some(section => section.href === pathname) || pathname.startsWith('/cuenta/');
+}
