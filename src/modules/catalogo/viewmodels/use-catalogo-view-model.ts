@@ -1,26 +1,226 @@
 import { useMemo, useState } from 'react';
-import { ComposedCatalogoService, type CatalogoService } from '../services/catalogo-service';
+
+import { NavigationSections } from '@/constants/navigation';
+import {
+  CATEGORIAS_CATALOGO,
+  type CategoriaCatalogo,
+} from '@/modules/catalogo/models/catalogo';
+import type { TarjetaCatalogo } from '@/modules/catalogo/viewmodels/catalogo-state';
+import {
+  ComposedCatalogoService,
+  type CatalogoService,
+} from '@/modules/catalogo/services/catalogo-service';
 import { CatalogoViewModel } from './catalogo-view-model';
-import type { TarjetaCatalogo } from './catalogo-state';
+import type { Curso } from '@/modules/cursos/models/curso';
+import type { Servicio } from '@/modules/servicios/models/servicio';
 import { formatPrice } from '@/utils/format-price';
 import { useLoadState } from '@/shared/viewmodels/use-load-state';
+import {
+  filterProductos,
+  opcionesFiltroProductos,
+  sortProductos,
+  ORDEN_PRODUCTOS,
+} from '@/modules/productos/viewmodels/product-filters';
+
 const defaultService: CatalogoService = new ComposedCatalogoService();
-function normalize(value: string) { return value.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase(); }
-export function filtrarCursos(cursos: import('../models/catalogo').DatosCatalogo['Cursos'], busqueda: string, nivel: string) {
- const query = normalize(busqueda);
- return cursos.filter(item => (!query || [item.nombre, item.descripcion, item.nivel].some(value => value && normalize(value).includes(query))) && (nivel === 'Todos' || item.nivel === nivel));
+
+function normalize(value: string) {
+  return value
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase();
 }
-export function useCatalogoViewModel(_categoriaInicial?: string, busquedaInicial = '', service: CatalogoService = defaultService) {
- const viewModel = useMemo(() => new CatalogoViewModel(service), [service]);
- const { estado, tipoError } = useLoadState(viewModel);
- const [busqueda, cambiarBusqueda] = useState(busquedaInicial);
- const [filtroCurso, seleccionarFiltroCurso] = useState('Todos');
- const tarjetas: readonly TarjetaCatalogo[] = filtrarCursos(estado.datos.Cursos, busqueda, filtroCurso).map(item => ({
-  id: item.id, title: item.nombre, description: item.descripcion ?? undefined, price: formatPrice(item.precio), kind: 'course', image: item.imagen,
-  href: { pathname: '/cursos', params: { id: item.id } },
- }));
- return { estado, tipoError, busqueda, cambiarBusqueda, tarjetas, filtroCurso, seleccionarFiltroCurso,
-  filtrosCurso: ['Todos', ...new Set(estado.datos.Cursos.map(item => item.nivel).filter((value): value is string => !!value))],
-  cargando: estado.estadoCarga === 'cargando', error: estado.error, vacio: estado.estadoCarga === 'listo' && tarjetas.length === 0,
-  recargar: () => viewModel.cargar() };
+
+export function filtrarCursos(
+  cursos: import('../models/catalogo').DatosCatalogo['Cursos'],
+  busqueda: string,
+  nivel: string,
+) {
+  const query = normalize(busqueda);
+
+  return cursos.filter(
+    (item) =>
+      (!query ||
+        [item.nombre, item.descripcion, item.nivel].some(
+          (value) => value && normalize(value).includes(query),
+        )) &&
+      (nivel === 'Todos' || item.nivel === nivel),
+  );
+}
+
+function categoriaValida(value?: string): CategoriaCatalogo {
+  return CATEGORIAS_CATALOGO.find((category) => category === value) ?? 'Servicios';
+}
+
+function tarjeta(
+  item: Curso | Servicio,
+  kind: TarjetaCatalogo['kind'],
+): TarjetaCatalogo {
+  return {
+    id: item.id,
+    title: item.nombre,
+    description: item.descripcion ?? undefined,
+    price: formatPrice(item.precio),
+    kind,
+    image: 'imagen' in item ? item.imagen : undefined,
+    href: {
+      pathname:
+        kind === 'service'
+          ? NavigationSections.services.href
+          : NavigationSections.courses.href,
+      params: { id: item.id },
+    },
+  };
+}
+
+export function useCatalogoViewModel(
+  categoriaInicial?: string,
+  busquedaInicial = '',
+  service: CatalogoService = defaultService,
+) {
+  const viewModel = useMemo(
+    () => new CatalogoViewModel(service),
+    [service],
+  );
+
+  const { estado: datosEstado, tipoError } = useLoadState(viewModel);
+
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(
+    () => categoriaValida(categoriaInicial),
+  );
+  const [busqueda, setBusqueda] = useState(busquedaInicial);
+  const [filtroServicio, setFiltroServicio] = useState('Todas');
+  const [filtroCurso, setFiltroCurso] = useState('Todos');
+  const [filtroProducto, setFiltroProducto] = useState('Todos');
+  const [ordenProducto, setOrdenProducto] = useState('Publicación');
+
+  const estado = {
+    ...datosEstado,
+    categoriaSeleccionada,
+    busqueda,
+  };
+
+  function seleccionarCategoria(value: string) {
+    setCategoriaSeleccionada(categoriaValida(value));
+  }
+
+  function cambiarBusqueda(value: string) {
+    setBusqueda(value);
+  }
+
+  const tarjetas: Record<
+    Exclude<CategoriaCatalogo, 'Productos'>,
+    readonly TarjetaCatalogo[]
+  > = {
+    Servicios: estado.datos.Servicios.filter(
+      (item) =>
+        coincide(busqueda, [
+          item.nombre,
+          item.descripcion,
+          item.categoria,
+        ]) &&
+        (filtroServicio === 'Todas' ||
+          item.categoria === filtroServicio),
+    ).map((item) => tarjeta(item, 'service')),
+
+    Cursos: filtrarCursos(
+      estado.datos.Cursos,
+      busqueda,
+      filtroCurso,
+    ).map((item) => tarjeta(item, 'course')),
+  };
+
+  const productFilters = opcionesFiltroProductos(estado.datos.Productos);
+
+  const serviceFilters = [
+    'Todas',
+    ...new Set(
+      estado.datos.Servicios
+        .map((item) => item.categoria)
+        .filter((value): value is string => !!value),
+    ),
+  ];
+
+  const courseFilters = [
+    'Todos',
+    ...new Set(
+      estado.datos.Cursos
+        .map((item) => item.nivel)
+        .filter((value): value is string => !!value),
+    ),
+  ];
+
+  const filteredProductsByFacet = sortProductos(
+    filterProductos(
+      estado.datos.Productos,
+      busqueda,
+      filtroProducto,
+    ),
+    ordenProducto,
+  );
+
+  return {
+    estado,
+    cargando: estado.estadoCarga === 'cargando',
+    error: estado.error,
+    tipoError,
+
+    mensajeVacio:
+      estado.estadoCarga === 'listo'
+        ? 'No hay elementos disponibles en esta categoría.'
+        : null,
+
+    categorias: CATEGORIAS_CATALOGO,
+    categoriaSeleccionada,
+    seleccionarCategoria,
+    busqueda,
+    cambiarBusqueda,
+
+    tarjetas:
+      categoriaSeleccionada === 'Productos'
+        ? []
+        : tarjetas[categoriaSeleccionada],
+
+    productos: filteredProductsByFacet,
+    productosFiltrados: filteredProductsByFacet,
+
+    recargar: () => viewModel.cargar(),
+
+    vacio:
+      estado.estadoCarga === 'listo' &&
+      (categoriaSeleccionada === 'Productos'
+        ? filteredProductsByFacet.length === 0
+        : tarjetas[categoriaSeleccionada].length === 0),
+
+    filtrosProducto: productFilters,
+    filtroProducto,
+    seleccionarFiltroProducto: setFiltroProducto,
+
+    ordenesProducto: ORDEN_PRODUCTOS,
+    ordenProducto,
+    seleccionarOrdenProducto: setOrdenProducto,
+
+    filtrosServicio: serviceFilters,
+    filtroServicio,
+    seleccionarFiltroServicio: setFiltroServicio,
+
+    filtrosCurso: courseFilters,
+    filtroCurso,
+    seleccionarFiltroCurso: setFiltroCurso,
+  };
+}
+
+function coincide(
+  query: string,
+  values: readonly (string | null | undefined)[],
+) {
+  const normalized = normalize(query);
+
+  return (
+    !normalized ||
+    values.some(
+      (value) => value && normalize(value).includes(normalized),
+    )
+  );
 }

@@ -4,8 +4,9 @@ import { LoadState } from '@/shared/viewmodels/load-state';
 
 export class CatalogoViewModel extends LoadState<DatosCatalogo> {
   constructor(private readonly service: CatalogoService) {
-    super({ Cursos: [] }, 'cargando');
+    super({ Servicios: [], Cursos: [], Productos: [] }, 'cargando');
   }
 
-  cargar = (signal?: AbortSignal) => this.load(() => this.service.obtener({ signal }));
+  cargar = (signal?: AbortSignal) =>
+    this.load(() => this.service.obtener({ signal }));
 }

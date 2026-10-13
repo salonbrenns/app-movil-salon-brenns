@@ -1,25 +1,174 @@
 import { useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
+
 import { Screen } from '@/components/ui/screen';
-import { CatalogCard, ChoiceChips, SearchField, SectionHeading } from '@/components/ui/style-guide';
+import {
+  CatalogCard,
+  ChoiceChips,
+  SearchField,
+  SectionHeading,
+  SegmentedControl,
+} from '@/components/ui/style-guide';
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from '@/components/feedback/async-states';
+import { ProductosListView } from '@/modules/productos/views/productos-list-view';
 import { Spacing } from '@/theme';
-import { useCatalogoViewModel } from '../viewmodels/use-catalogo-view-model';
-import { EmptyState, ErrorState, LoadingState } from '@/components/feedback/async-states';
+import { useCatalogoViewModel } from '@/modules/catalogo/viewmodels/use-catalogo-view-model';
+
 export default function CatalogScreen() {
- const { q } = useLocalSearchParams<{ q?: string }>();
- return <CatalogContent key={q ?? ''} busquedaInicial={q} />;
+  const { categoria, q } = useLocalSearchParams<{
+    categoria?: string;
+    q?: string;
+  }>();
+
+  return (
+    <CatalogContent
+      key={`${categoria ?? 'Servicios'}-${q ?? ''}`}
+      categoriaInicial={categoria}
+      busquedaInicial={q}
+    />
+  );
 }
-function CatalogContent({ busquedaInicial }: { busquedaInicial?: string }) {
- const vm = useCatalogoViewModel('Cursos', busquedaInicial);
- return <Screen title="Cursos">
-  <SearchField placeholder="Buscar cursos…" value={vm.busqueda} onChangeText={vm.cambiarBusqueda} />
-  <View style={styles.section}><SectionHeading title="Cursos disponibles" />
-   <ChoiceChips options={vm.filtrosCurso.map(value => ({ value, label: value }))} selected={vm.filtroCurso} onSelect={vm.seleccionarFiltroCurso} />
-   {vm.cargando ? <LoadingState label="Cargando cursos…" /> : null}
-   {!vm.cargando && vm.error ? <ErrorState message={vm.error} onRetry={vm.recargar} /> : null}
-   {!vm.cargando && !vm.error && vm.vacio ? <EmptyState title="No encontramos resultados" description={vm.busqueda ? 'Prueba otra búsqueda.' : 'No hay cursos disponibles.'} /> : null}
-   {!vm.cargando && !vm.error ? vm.tarjetas.map(({ id, ...card }) => <CatalogCard key={id} {...card} />) : null}
-  </View>
- </Screen>;
+
+function CatalogContent({
+  categoriaInicial,
+  busquedaInicial,
+}: {
+  categoriaInicial?: string;
+  busquedaInicial?: string;
+}) {
+  const {
+    categorias,
+    categoriaSeleccionada,
+    seleccionarCategoria,
+    busqueda,
+    cambiarBusqueda,
+    tarjetas,
+    productosFiltrados,
+    cargando,
+    error,
+    vacio,
+    recargar,
+    filtrosProducto,
+    filtroProducto,
+    seleccionarFiltroProducto,
+    ordenesProducto,
+    ordenProducto,
+    seleccionarOrdenProducto,
+    filtrosServicio,
+    filtroServicio,
+    seleccionarFiltroServicio,
+    filtrosCurso,
+    filtroCurso,
+    seleccionarFiltroCurso,
+  } = useCatalogoViewModel(categoriaInicial, busquedaInicial);
+
+  return (
+    <Screen title="Catálogo">
+      <SearchField
+        placeholder="Buscar en esta categoría…"
+        value={busqueda}
+        onChangeText={cambiarBusqueda}
+      />
+
+      <SegmentedControl
+        options={categorias}
+        selected={categoriaSeleccionada}
+        onSelect={seleccionarCategoria}
+      />
+
+      <View style={styles.section}>
+        <SectionHeading title={categoriaSeleccionada} />
+
+        {categoriaSeleccionada === 'Servicios' ? (
+          <ChoiceChips
+            options={filtrosServicio.map((value) => ({
+              value,
+              label: value,
+            }))}
+            selected={filtroServicio}
+            onSelect={seleccionarFiltroServicio}
+          />
+        ) : null}
+
+        {categoriaSeleccionada === 'Cursos' ? (
+          <ChoiceChips
+            options={filtrosCurso.map((value) => ({
+              value,
+              label: value,
+            }))}
+            selected={filtroCurso}
+            onSelect={seleccionarFiltroCurso}
+          />
+        ) : null}
+
+        {categoriaSeleccionada === 'Productos' ? (
+          <>
+            <ChoiceChips
+              options={filtrosProducto.map((value) => ({
+                value,
+                label: value,
+              }))}
+              selected={filtroProducto}
+              onSelect={seleccionarFiltroProducto}
+            />
+
+            <ChoiceChips
+              options={ordenesProducto.map((value) => ({
+                value,
+                label: value,
+              }))}
+              selected={ordenProducto}
+              onSelect={seleccionarOrdenProducto}
+            />
+          </>
+        ) : null}
+
+        {cargando ? (
+          <LoadingState label="Cargando catálogo…" />
+        ) : null}
+
+        {!cargando && error ? (
+          <ErrorState message={error} onRetry={recargar} />
+        ) : null}
+
+        {!cargando && !error && vacio ? (
+          <EmptyState
+            title="No encontramos resultados"
+            description={
+              busqueda
+                ? 'Prueba otra búsqueda.'
+                : 'No hay elementos disponibles en esta categoría.'
+            }
+          />
+        ) : null}
+
+        {!cargando && !error ? (
+          categoriaSeleccionada === 'Productos' ? (
+            <ProductosListView
+              productos={productosFiltrados}
+              resetKey={JSON.stringify([
+                busqueda,
+                filtroProducto,
+                ordenProducto,
+              ])}
+            />
+          ) : (
+            tarjetas.map(({ id, ...card }) => (
+              <CatalogCard key={id} {...card} />
+            ))
+          )
+        ) : null}
+      </View>
+    </Screen>
+  );
 }
-const styles = StyleSheet.create({ section: { gap: Spacing.three } });
+
+const styles = StyleSheet.create({
+  section: {
+    gap: Spacing.three,
+  },
+});
