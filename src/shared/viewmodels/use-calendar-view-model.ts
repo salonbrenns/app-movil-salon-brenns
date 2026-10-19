@@ -23,5 +23,5 @@ export function useCalendarViewModel(today: string, blocked: readonly string[]) 
     const value = `${next.getUTCFullYear()}-${String(next.getUTCMonth() + 1).padStart(2, '0')}`;
     if (value >= firstMonth) setVisibleMonth(value);
   };
-  return { title, cells, canPrevious: month > firstMonth, previous: () => move(-1), next: () => move(1) };
+  return { title, cells, canPrevious: month > firstMonth, previous: () => { move(-1); }, next: () => { move(1); } };
 }

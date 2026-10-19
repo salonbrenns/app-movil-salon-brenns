@@ -23,15 +23,23 @@ export function instant(value: unknown, path: string): string {
 }
 export function cents(value: number | string): bigint {
   const raw = String(value);
-
-  if (!/^-?\d+(?:\.\d{1,2})?$/.test(raw)) {
-    throw new InputError("Importe inválido.");
-  }
-
   const negative = raw.startsWith("-");
   const normalized = negative ? raw.slice(1) : raw;
+  const point = normalized.indexOf(".");
+  const integer = point < 0 ? normalized : normalized.slice(0, point);
+  const fraction = point < 0 ? "" : normalized.slice(point + 1);
 
-  const [integer, fraction = ""] = normalized.split(".");
+  function digits(part: string): boolean {
+    for (let index = 0; index < part.length; index += 1) {
+      const code = part.charCodeAt(index);
+      if (code < 48 || code > 57) return false;
+    }
+    return true;
+  }
+
+  if (!integer || !digits(integer) || (point >= 0 && (fraction.length < 1 || fraction.length > 2 || !digits(fraction)))) {
+    throw new InputError("Importe inválido.");
+  }
 
   const result = BigInt(integer) * 100n + BigInt(fraction.padEnd(2, "0"));
 

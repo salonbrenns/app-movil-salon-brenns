@@ -67,11 +67,10 @@ function CursoPrueba() {
 }
 
 describe("Integración con API simulada usando MSW", () => {
-  test("obtiene cursos desde una respuesta simulada", async () => {
-    await render(<CursoPrueba />);
-
-    expect(await screen.findByText("Curso de colorimetría")).toBeTruthy();
-  });
+  test("obtiene cursos desde una respuesta simulada", () =>
+    render(<CursoPrueba />).then(async () => {
+      expect(await screen.findByText("Curso de colorimetría")).toBeTruthy();
+    }));
 
   test("maneja un error del servidor", async () => {
     server.use(
@@ -87,8 +86,8 @@ describe("Integración con API simulada usando MSW", () => {
       }),
     );
 
-    await render(<CursoPrueba />);
-
-    expect(await screen.findByText("Error")).toBeTruthy();
+    return render(<CursoPrueba />).then(async () => {
+      expect(await screen.findByText("Error")).toBeTruthy();
+    });
   });
 });

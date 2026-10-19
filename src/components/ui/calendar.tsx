@@ -30,7 +30,7 @@ export function Calendar({ vm, selected, onSelect, disabled }: CalendarProps) {
           accessibilityLabel={`Seleccionar ${cell.day}`}
           accessibilityState={{ selected: selected === cell.day, disabled: disabled || !cell.selectable }}
           disabled={disabled || !cell.selectable}
-          onPress={() => onSelect(cell.day)}
+          onPress={() => { onSelect(cell.day); }}
           style={[styles.day, { backgroundColor: selected === cell.day ? theme.primary : theme.backgroundElement, borderColor: theme.border, opacity: disabled || !cell.selectable ? 0.45 : 1 }]}
         ><ThemedText type="label" themeColor={selected === cell.day ? 'onPrimary' : 'text'}>{cell.number}</ThemedText></Pressable> : null}
       </View>)}

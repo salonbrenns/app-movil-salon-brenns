@@ -13,6 +13,6 @@ export function usePaginationViewModel<T>(allItems: readonly T[], resetKey: stri
     items: allItems.slice((currentPage - 1) * size, currentPage * size),
     currentPage, totalPages,
     canPrevious: currentPage > 1, canNext: currentPage < totalPages,
-    previous: () => setPage(currentPage - 1), next: () => setPage(currentPage + 1), setPage,
+    previous: () => { setPage(currentPage - 1); }, next: () => { setPage(currentPage + 1); }, setPage,
   };
 }
