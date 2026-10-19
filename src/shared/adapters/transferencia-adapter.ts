@@ -2,6 +2,8 @@ import { record, decimal } from './validation';
 import { AdapterError } from './adapter-error';
 import { bancoAprobado, anticipoPorcentajeWeb } from '@/config/transferencia-aprobada';
 import type { ConfigTransferencia } from '../models/transferencia';
+import { cents, money } from './account-validation';
+import { InputError } from './input-error';
 
 function optional(value: unknown): string | null { return typeof value === 'string' && value.trim() ? value.trim() : null; }
 export function transferenciaResponse(value: unknown): ConfigTransferencia {
@@ -14,4 +16,15 @@ export function transferenciaResponse(value: unknown): ConfigTransferencia {
   if (!Number.isFinite(porcentaje) || porcentaje <= 0 || porcentaje > 100) throw new AdapterError('config-sitio.anticipo_porcentaje', 'porcentaje mayor que 0 y hasta 100');
   decimal(porcentaje, 'config-sitio.anticipo_porcentaje');
   return { banco: complete ? { titular: titular!, banco: banco!, cuenta, clabe, celular: optional(dto.banco_celular) } : bancoAprobado, anticipoPorcentaje: porcentaje, fuente: complete ? 'api' : 'aprobada' };
+}
+
+export function importeReserva(precio: number | string, tipoPago: 'ANTICIPO' | 'COMPLETO', porcentaje: number): string {
+  const precioCentavos = cents(precio);
+  if (precioCentavos < 0n) throw new InputError('Importe de reserva inválido.');
+  if (tipoPago === 'COMPLETO') return money(precioCentavos);
+  if (!Number.isFinite(porcentaje) || porcentaje <= 0 || porcentaje > 100)
+    throw new InputError('Porcentaje de anticipo inválido.');
+  const porcentajeCentésimas = cents(porcentaje);
+  // El importe enviado al servidor se expresa en centavos; los medios centavos se redondean hacia arriba.
+  return money((precioCentavos * porcentajeCentésimas + 5000n) / 10000n);
 }
