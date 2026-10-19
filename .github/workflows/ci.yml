@@ -45,7 +45,7 @@ jobs:
       - name: Pruebas Jest y cobertura
         run: npm run test:coverage -- --runInBand
 
-      - name: SonarQube Cloud
-        uses: SonarSource/sonarqube-scan-action@v8.3.0
+      - name: Subir cobertura a Codacy
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        run: bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage/lcov.info
