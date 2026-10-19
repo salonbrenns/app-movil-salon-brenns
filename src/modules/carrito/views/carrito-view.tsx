@@ -39,10 +39,10 @@ export default function CarritoView() {
         <InfoRow label="Nombre" value={vm.perfil.nombre} /><InfoRow label="Correo" value={vm.perfil.correo} />
         <Link href="/cuenta/editar-perfil" asChild><Button label="Editar datos" variant="secondary" /></Link>
         <ChoiceChips options={[{ value: 'transferencia', label: 'Transferencia' }, { value: 'efectivo', label: 'Efectivo' }, { value: 'tarjeta', label: 'Tarjeta' }]} selected={vm.metodoPago} onSelect={vm.cambiarMetodoPago} />
-        <ThemedText type="small" themeColor="textSecondary">Al confirmar se creará tu pedido. El estado del pago se consulta en Mis compras.</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">La confirmación de pedidos estará disponible cuando se confirme el contrato de ventas del servidor.</ThemedText>
       </> : null}
       {!vm.existenciasValidas ? <ThemedText type="small" themeColor="textSecondary">Revisa las cantidades y existencias antes de confirmar el pedido.</ThemedText> : null}
-      <Button label="Confirmar pedido" loading={vm.ocupado} disabled={!vm.perfil || !vm.existenciasValidas || vm.cargando || vm.ocupado} onPress={() => { void vm.confirmarPedido(); }} />
+      <Button label="Confirmar pedido" loading={vm.ocupado} disabled={!vm.pedidoDisponible || !vm.perfil || !vm.existenciasValidas || vm.cargando || vm.ocupado} />
     </> : null}
     <Link href="/cuenta/compras" asChild><Button label="Ver mis compras" variant="secondary" /></Link>
   </Screen>;
