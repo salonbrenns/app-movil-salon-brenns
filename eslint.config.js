@@ -5,7 +5,7 @@ const expoConfig = require('eslint-config-expo/flat');
 module.exports = defineConfig([
   expoConfig,
   {
-    ignores: ['dist/*'],
+    ignores: ['dist/*', 'coverage/**'],
   },
   {
     files: ['src/hooks/use-color-scheme.web.ts'],

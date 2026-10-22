@@ -11,6 +11,7 @@ const { filtrarCursos } = require('@/modules/catalogo/viewmodels/use-catalogo-vi
 const { loginDestination, isProtectedPath } = require('@/modules/auth/models/auth-navigation');
 // Local fixtures using the already implemented contracts; no backend requests.
 const dto = { id: 7, titulo: 'Curso de especialización', descripcion: null, precio_total: '1200.00', duracion_horas: 20, nivel: 'Avanzado', fecha_inicio: '2026-09-30T00:00:00.000Z', fecha_fin: null };
+const emptyList = { listar: async () => [] };
 function fixture(body, status = 200) {
  const requests = [];
  const http = new FetchHttpClient(() => 'https://example.invalid', async (url, options) => {
@@ -22,9 +23,9 @@ function fixture(body, status = 200) {
 test('course-only catalog and detail consume the real HTTP service and Adapter', async () => {
  const f = fixture({ cursos: [dto] });
  const service = new HttpCursosService(f.http);
- const catalog = new CatalogoViewModel(new ComposedCatalogoService(service));
+ const catalog = new CatalogoViewModel(new ComposedCatalogoService(emptyList, service, emptyList));
  await catalog.cargar();
- assert.deepEqual(Object.keys(catalog.getSnapshot().datos), ['Cursos']);
+ assert.deepEqual(Object.keys(catalog.getSnapshot().datos), ['Servicios', 'Cursos', 'Productos']);
  assert.equal(catalog.getSnapshot().datos.Cursos[0].precio, '1200.00');
  const detail = new CursosViewModel(service, '7'); await detail.cargar();
  assert.equal(detail.getSnapshot().datos.nombre, dto.titulo);
@@ -33,7 +34,7 @@ test('course-only catalog and detail consume the real HTTP service and Adapter',
 });
 test('course list failures do not become successful empty catalogs', async () => {
  for (const [body, status, kind] of [[{ error: 'Fixture outage' }, 500, 'http'], [{ cursos: [ { ...dto, precio_total: null } ] }, 200, 'adaptacion']]) {
-  const vm = new CatalogoViewModel(new ComposedCatalogoService(new HttpCursosService(fixture(body,status).http)));
+  const vm = new CatalogoViewModel(new ComposedCatalogoService(emptyList, new HttpCursosService(fixture(body,status).http), emptyList));
   await vm.cargar(); assert.equal(vm.getSnapshot().estadoCarga, 'error'); assert.equal(vm.getErrorType(), kind);
  }
 });
@@ -53,7 +54,8 @@ test('existing course search is accent-insensitive and combines name/description
 });
 test('included login destinations retain the common routes and reject unimplemented/external ones', () => {
  for (const p of ['/', '/catalogo?categoria=Cursos&q=color', '/cursos?id=7', '/agenda', '/servicios', '/perfil', '/cuenta/cerrar-sesion']) assert.equal(loginDestination(p),p);
- for (const p of ['/carrito', '/productos/1', '/cuenta/compras', '/autenticacion', '//evil.invalid', 'https://evil.invalid', '/cursos#fragment', '/cuenta/cursos/extra']) assert.equal(loginDestination(p), '/');
+ for (const p of ['/carrito', '/productos/1', '/autenticacion', '//evil.invalid', 'https://evil.invalid', '/cursos#fragment', '/cuenta/cursos/extra']) assert.equal(loginDestination(p), '/');
+ assert.equal(loginDestination('/cuenta/compras'), '/cuenta/compras');
  assert.equal(isProtectedPath('/cuenta/cerrar-sesion'),true); assert.equal(isProtectedPath('/cursos'),false); assert.equal(isProtectedPath('/cuenta/crear-cuenta'),false);
 });
 

@@ -13,8 +13,8 @@ export function BottomNavigation() {
   const pathname = usePathname();
   const theme = useTheme();
   if (!showsBottomNavigation(pathname)) return null;
-  const activeHref = ['/catalogo', '/cursos'].includes(pathname) ? '/catalogo'
-    : pathname === '/agenda' ? '/agenda' : pathname === '/perfil' ? '/perfil' : pathname.startsWith('/cuenta/') ? '/cuenta/cursos' : '/';
+  const activeHref = ['/catalogo', '/cursos', '/servicios'].includes(pathname) ? '/catalogo'
+    : pathname === '/agenda' ? '/agenda' : pathname === '/carrito' ? '/carrito' : pathname === '/perfil' || pathname.startsWith('/cuenta/') ? '/perfil' : '/';
 
   return (
     <SafeAreaView edges={['left', 'right', 'bottom']} style={[styles.surface, { backgroundColor: theme.backgroundElement, borderTopColor: theme.border }]}>
@@ -23,7 +23,7 @@ export function BottomNavigation() {
           const selected = item.href === activeHref;
           const color = selected ? theme.primary : theme.inactive;
           return (
-            <Link key={item.href} href={item.href} replace asChild>
+            <Link key={item.href} href={item.href} replace={item.href !== '/carrito'} push={item.href === '/carrito' && !selected} asChild>
               <Touchable
                 selected={selected}
                 accessibilityRole="tab"

@@ -5,7 +5,6 @@ import { ThemedView } from '@/components/themed-view';
 import { accountSectionStyles as styles } from '@/components/ui/account-section-styles';
 import { CustomButton as Button } from '@/components/ui/button';
 import { CustomInput as TextField } from '@/components/ui/text-field';
-import { Touchable } from '@/components/ui/touchable';
 import { StatusMessage } from '@/components/feedback/status-message';
 import { useAutenticacionViewModel } from '../viewmodels/use-autenticacion-view-model';
 import { CrearCuentaView } from './crear-cuenta-view';
@@ -24,7 +23,7 @@ export function AutenticacionSeccionView({ seccion }: { seccion: string }) {
       <ThemedText type="small" themeColor="textSecondary">¿Estás segura de que deseas cerrar tu sesión?</ThemedText>
       {messages}
       <Button label="Cerrar sesión" loading={vm.cargando} onPress={() => { void vm.cerrarSesion(); }} />
-      <Link href="/" asChild><Touchable disabled={vm.cargando} accessibilityRole="link" style={styles.centeredLink}><ThemedText type="label" themeColor="primary">Cancelar</ThemedText></Touchable></Link>
+      <Link href="/perfil" asChild><Button label="Cancelar" variant="secondary" disabled={vm.cargando} /></Link>
     </ThemedView> : null}
     {vm.section === 'verificar-email' ? <View style={styles.form}>
       {!vm.completado ? <>

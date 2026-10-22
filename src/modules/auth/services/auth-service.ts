@@ -7,6 +7,8 @@ export interface AuthService {
   registrar(campos: CamposAutenticacion): Promise<RegistroConfirmado>;
   verificarCorreo(token: string): Promise<void>;
   reenviarVerificacion(correo: string): Promise<void>;
+  recuperarContrasena(correo: string): Promise<void>;
+  restablecerContrasena(token: string, password: string): Promise<void>;
 }
 
 export class HttpAuthService implements AuthService {
@@ -28,6 +30,14 @@ export class HttpAuthService implements AuthService {
 
   async reenviarVerificacion(correo: string): Promise<void> {
     await this.postOk('/api/auth/reenviar-verificacion', { correo: correo.trim() }, 'Reenvío de verificación');
+  }
+
+  async recuperarContrasena(correo: string): Promise<void> {
+    await this.postOk('/api/auth/recuperar-contrasena', { correo: correo.trim() }, 'Recuperación de contraseña');
+  }
+
+  async restablecerContrasena(token: string, password: string): Promise<void> {
+    await this.postOk('/api/auth/reset-contrasena', { token: token.trim(), password }, 'Nueva contraseña');
   }
 
   private async postOk(path: string, body: Record<string, string>, operation: string): Promise<void> {

@@ -13,7 +13,7 @@ export const BottomNavigationItems = [
  { href: '/', label: 'Inicio', icon: 'home' },
  { href: '/catalogo', label: 'Catálogo', icon: 'catalog' },
  { href: '/agenda', label: 'Agenda', icon: 'agenda' },
- { href: '/cuenta/cursos', label: 'Mis cursos', icon: 'course' },
+ { href: '/carrito', label: 'Carrito', icon: 'cart' },
  { href: '/perfil', label: 'Perfil', icon: 'profile' },
 ] as const satisfies readonly { href: Href; label: string; icon: string }[];
 export function showsBottomNavigation(pathname: string) {
