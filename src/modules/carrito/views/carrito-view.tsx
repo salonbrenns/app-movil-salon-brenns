@@ -232,10 +232,7 @@ export default function CarritoView() {
                 el pedido.
               </ThemedText>
 
-              <InfoRow
-                label="Método de pago"
-                value="Transferencia bancaria"
-              />
+              <InfoRow label="Método de pago" value="Transferencia bancaria" />
 
               {vm.transferencia.datos &&
               !vm.transferencia.error ? (
