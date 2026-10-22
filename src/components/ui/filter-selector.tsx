@@ -8,7 +8,7 @@ export function FilterSelector({ label, options, selected, onSelect }: { label: 
   const [open, setOpen] = useState(false);
   return <View style={styles.group}>
     <ThemedText type="label">{label}</ThemedText>
-    <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={() => setOpen(!open)} style={styles.trigger}>
+    <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={() => { setOpen((value) => !value); }} style={styles.trigger}>
       <ThemedText type="small" style={styles.value}>{selected}</ThemedText>
       <Icon name="chevron-right" size={16} color={Colors.textSecondary} />
     </Pressable>

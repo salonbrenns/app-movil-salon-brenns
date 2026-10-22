@@ -12,8 +12,11 @@ export type AppHeaderProps = Readonly<{ title?: string; subtitle?: string; backH
 export function AppHeader({ title, subtitle, backHref, onBack, brand, compact, actions }: AppHeaderProps) {
   const goBack = useCallback(() => {
     if (onBack?.()) return;
-    if (router.canGoBack()) router.back();
-    else if (backHref) router.replace(backHref);
+    if (router.canGoBack()) {
+      router.back();
+    } else if (backHref) {
+      router.replace(backHref);
+    }
   }, [backHref, onBack]);
 
   useFocusEffect(useCallback(() => {
@@ -24,7 +27,7 @@ export function AppHeader({ title, subtitle, backHref, onBack, brand, compact, a
       router.replace(backHref);
       return true;
     });
-    return () => subscription.remove();
+    return () => { subscription.remove(); };
   }, [backHref, onBack]));
 
   if (!brand && !title && !subtitle && !actions) return null;

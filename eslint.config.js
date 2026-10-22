@@ -7,12 +7,4 @@ module.exports = defineConfig([
   {
     ignores: ['dist/*', 'coverage/**'],
   },
-  {
-    files: ['src/hooks/use-color-scheme.web.ts'],
-    rules: {
-      // The Expo starter applies the device theme after web hydration.
-      // Keep this diagnostic visible without changing the hydration hook.
-      'react-hooks/set-state-in-effect': 'warn',
-    },
-  },
 ]);

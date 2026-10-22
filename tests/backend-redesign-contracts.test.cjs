@@ -38,5 +38,9 @@ test('proof upload validates format and size and sends multipart file to the own
   assert.ok(calls[0].options.body instanceof FormData);
   assert.equal(calls[0].options.body.has('file'), true);
   assert.throws(() => comprobanteType({ ...asset, name: 'bad.txt', mimeType: 'text/plain' }), /JPG/);
+  assert.throws(() => comprobanteType({ ...asset, name: 'bad.txt', mimeType: 'application/pdf' }), /JPG/);
+  assert.throws(() => comprobanteType({ ...asset, name: 'constructor', mimeType: null }), /JPG/);
+  assert.throws(() => comprobanteType({ ...asset, name: 'photo.jpg', mimeType: 'application/pdf' }), /JPG/);
+  assert.equal(comprobanteType({ ...asset, name: 'photo.JPG', mimeType: null }), 'image/jpeg');
   assert.throws(() => comprobanteType({ ...asset, size: 11 * 1024 * 1024 }), /10 MB/);
 });

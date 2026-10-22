@@ -3,14 +3,23 @@ import { fetchHttpClient, type HttpMutationClient } from '@/services/api';
 import { apiId } from '@/shared/adapters/account-validation';
 import { confirmarOk } from '@/modules/auth/adapters/auth-adapter';
 
-const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
-const extensionType: Record<string, string> = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif', pdf: 'application/pdf' };
+function typeForExtension(extension: string): string | null {
+  switch (extension) {
+    case 'jpg':
+    case 'jpeg': return 'image/jpeg';
+    case 'png': return 'image/png';
+    case 'webp': return 'image/webp';
+    case 'gif': return 'image/gif';
+    case 'pdf': return 'application/pdf';
+    default: return null;
+  }
+}
 
 export function comprobanteType(asset: DocumentPickerAsset) {
   const extension = asset.name.split('.').pop()?.toLowerCase() ?? '';
-  const type = asset.mimeType ?? extensionType[extension];
-  if (!type || !allowedTypes.includes(type)) throw new Error('Selecciona un archivo JPG, PNG, WEBP, GIF o PDF.');
-  if (asset.size != null && asset.size > 10 * 1024 * 1024) throw new Error('El comprobante no puede superar 10 MB.');
+  const type = typeForExtension(extension);
+  if (!type || (asset.mimeType && asset.mimeType !== type)) throw new Error('Selecciona un archivo JPG, PNG, WEBP, GIF o PDF.');
+  if (asset.size != null && (asset.size < 0 || !Number.isFinite(asset.size) || asset.size > 10 * 1024 * 1024)) throw new Error('El comprobante no puede superar 10 MB.');
   return type;
 }
 

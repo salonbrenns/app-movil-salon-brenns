@@ -54,7 +54,7 @@ export default function CarritoView() {
         <ThemedText type="small" themeColor="textSecondary">Al confirmar se creará tu pedido pendiente de pago o validación. El estado se consulta en Mis compras.</ThemedText>
       </> : null}
       {!vm.existenciasValidas ? <ThemedText type="small" themeColor="textSecondary">Revisa las cantidades y existencias antes de confirmar el pedido.</ThemedText> : null}
-      <Button label="Confirmar pedido" loading={vm.ocupado} disabled={!vm.perfil || !vm.existenciasValidas || vm.cargando || vm.ocupado} onPress={() => { void vm.confirmarPedido(); }} />
+      <Button label="Confirmar pedido" loading={vm.ocupado} disabled={!vm.perfil || !vm.existenciasValidas || vm.cargando || vm.ocupado || !!vm.pedidoRegistrado} onPress={() => { void vm.confirmarPedido(); }} />
     </> : null}
     <Link href="/cuenta/compras" asChild><Button label="Ver mis compras" variant="secondary" /></Link>
   </Screen>;
