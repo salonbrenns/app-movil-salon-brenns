@@ -1,6 +1,6 @@
 import { StyleSheet, View, type ViewProps } from 'react-native';
 
-import { Radius, Spacing, Surfaces, type ThemeColor } from '@/constants/theme';
+import { Colors, Radius, Shadows, Sizes, Spacing, Surfaces, type ThemeColor } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 export type ThemedViewProps = ViewProps & {
@@ -23,8 +23,11 @@ export function ThemedView({ style, lightColor, type, surface, ...otherProps }: 
 
 const styles = StyleSheet.create({
   card: {
+    borderWidth: Sizes.borderWidth,
+    borderColor: Colors.border,
     borderRadius: Radius.card,
     padding: Spacing.three,
     gap: Spacing.two,
+    ...Shadows.card,
   },
 });

@@ -9,7 +9,7 @@ export function citasResponse(value: unknown): readonly Cita[] {
     return { id: identifier(dto.id, 'cita.id'), servicioNombre: text(servicio.nombre, 'cita.servicio.nombre'),
       fecha: instant(dto.fecha, 'cita.fecha'), hora: hour(dto.hora), duracion: text(servicio.duracion, 'cita.servicio.duracion'),
       estado: text(dto.estado, 'cita.estado'), empleado: dto.empleado == null ? null : text(record(dto.empleado, 'cita.empleado').nombre, 'cita.empleado.nombre'),
-      notas: dto.notas == null ? null : nullableText(dto.notas, 'cita.notas') };
+      notas: dto.notas == null ? null : nullableText(dto.notas, 'cita.notas'), comprobanteRecibido: !!nullableText(dto.comprobante, 'cita.comprobante') };
   });
 }
 export function horariosResponse(value: unknown): Disponibilidad {

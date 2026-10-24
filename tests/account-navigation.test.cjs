@@ -10,6 +10,12 @@ Module._load = function(request,...args) {
  if (request === '@/modules/auth/viewmodels/auth-session-provider') return { useAuthSession: () => ({status}) };
  if (request === '@/modules/auth/views/autenticacion-seccion-view') return { AutenticacionSeccionView: 'AuthSection' };
  if (request === '@/modules/cursos/views/mis-cursos-view') return { MisCursosView: 'MisCursos' };
+ if (request === '@/modules/favoritos/views/favoritos-view') return { FavoritosView: 'Favoritos' };
+ if (request === './cuenta-informacion-view') return { CuentaInformacionView: 'CuentaInformacion' };
+ if (request === '@/modules/auth/views/recuperacion-view') return { RecuperacionView: 'Recuperacion' };
+ if (request === '@/modules/ventas/views/compras-view') return { ComprasView: 'Compras' };
+ if (request === '@/modules/perfil/views/editar-perfil-view') return { EditarPerfilView: 'EditarPerfil' };
+ if (request === '@/modules/perfil/views/seguridad-view') return { SeguridadView: 'Seguridad' };
  return load.call(this,request,...args);
 };
 const CuentaView = require('@/modules/cuenta/views/cuenta-view').default;
@@ -27,4 +33,21 @@ test('Mis cursos requires a confirmed session before rendering its account secti
  seccion = 'cursos'; status = 'loading'; let result=CuentaView(); assert.equal(result.props.children.type,'LoadingState');
  status = 'anonymous'; result=CuentaView(); assert.equal(result.type,'Redirect'); assert.equal(result.props.href.params.returnTo,'/cuenta/cursos');
  status = 'authenticated'; result=CuentaView(); assert.equal(result.type,'Screen'); assert.equal(result.props.children.props.destino.modulo,'cursos');
+ assert.equal(result.props.backHref, '/perfil');
+});
+
+test('Configuración waits for authentication and preserves the requested destination', () => {
+ seccion = 'configuracion'; status = 'loading';
+ let result = CuentaView();
+ assert.equal(result.type, 'Screen');
+ assert.equal(result.props.children.type, 'LoadingState');
+ status = 'anonymous'; result = CuentaView();
+ assert.equal(result.type, 'Redirect');
+ assert.equal(result.props.href.params.returnTo, '/cuenta/configuracion');
+ status = 'authenticated'; result = CuentaView();
+ assert.equal(result.type, 'Screen');
+ assert.equal(result.props.children.props.destino.seccion, 'configuracion');
+ seccion = 'apariencia'; status = 'anonymous'; result = CuentaView();
+ assert.equal(result.type, 'Redirect');
+ assert.equal(result.props.href.params.returnTo, '/cuenta/apariencia');
 });

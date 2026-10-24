@@ -10,7 +10,10 @@ import type { Servicio } from '@/modules/servicios/models/servicio';
 import { HttpAgendaService } from '../services/agenda-service';
 import type { Disponibilidad, ReservaCreada } from '../models/cita';
 import { reservarConDisponibilidad } from './reserva-actions';
+import { HttpComprobanteService } from '@/shared/services/comprobante-service';
+import type { DocumentPickerAsset } from 'expo-document-picker';
 const service = new HttpAgendaService();
+const comprobantes = new HttpComprobanteService();
 type Draft = { scope: string; fecha: string; hora: string | null; tipoPago: 'ANTICIPO' | 'COMPLETO' };
 export function useReservaViewModel(servicio: Servicio, empleadoId?: string) {
   const { sessionRevision } = useAuthSession();
@@ -19,6 +22,7 @@ export function useReservaViewModel(servicio: Servicio, empleadoId?: string) {
   const [draft, setDraft] = useState<Draft | null>(null);
   const [receipt, setReceipt] = useState<{ scope: string; cita: ReservaCreada; fecha: string; hora: string; tipoPago: 'ANTICIPO' | 'COMPLETO'; importe: string } | null>(null);
   const [conflict, setConflict] = useState<{ scope: string; message: string } | null>(null);
+  const [proofSent, setProofSent] = useState<string | null>(null);
   if (draft && draft.scope !== scope) setDraft(null);
   if (receipt && receipt.scope !== scope) setReceipt(null);
   if (conflict && conflict.scope !== scope) setConflict(null);
@@ -36,7 +40,7 @@ export function useReservaViewModel(servicio: Servicio, empleadoId?: string) {
   const importe = receipt?.scope === scope ? receipt.importe : transferencia.datos ? importeReserva(servicio.precio, tipoPago, transferencia.datos.anticipoPorcentaje) : null;
   const puedeReservar = selected && !vm.ocupado && !vm.cargando && !cita && !!importe && !transferencia.cargando && !transferencia.error;
   const change = (value: Partial<Draft>) => { if (!vm.ocupado) setDraft({ scope, fecha, hora, tipoPago, ...value }); };
-  return { ...vm, dias, transferencia, calendar, fecha, hora: receipt?.scope === scope ? receipt.hora : selected ? hora : null, tipoPago, importe, cita, horarios,
+  return { ...vm, dias, transferencia, calendar, fecha, hora: receipt?.scope === scope ? receipt.hora : selected ? hora : null, tipoPago, importe, cita, comprobanteEnviado: proofSent === scope, horarios,
     conflicto: conflict?.scope === scope ? conflict.message : null,
     consultado: fechaValida && vm.datos !== null, sinAtencion: !!vm.datos?.sinAtencion,
     cambiarFecha: (next: string) => { if (dias.datos && selectableDay(next, today, dias.datos)) { change({ fecha: next, hora: null }); setConflict(null); } },
@@ -47,5 +51,6 @@ export function useReservaViewModel(servicio: Servicio, empleadoId?: string) {
       () => reservarConDisponibilidad(() => service.reservar(servicio.id, fecha, hora, importe, empleadoId), async () => { await Promise.all([vm.recargar(), dias.recargar()]); }, () => { setDraft((previous) => previous?.scope === scope && previous.fecha === fecha ? { ...previous, hora: null } : previous); setConflict({ scope, message: 'La disponibilidad cambió. Selecciona otra fecha u hora antes de confirmar.' }); }),
       (result) => 'Cita #' + result.id + ' registrada. El pago por transferencia está pendiente.',
       (result) => setReceipt({ scope, cita: result, fecha, hora, tipoPago, importe })) : Promise.resolve(false),
+    enviarComprobante: async (asset: DocumentPickerAsset) => { if (!cita) throw new Error('Primero registra la cita.'); await comprobantes.subir('citas', cita.id, asset); setProofSent(scope); },
   };
 }
