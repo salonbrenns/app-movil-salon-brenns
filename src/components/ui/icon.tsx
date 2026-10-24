@@ -24,9 +24,30 @@ const drawings = {
 
 export type IconName = keyof typeof drawings;
 
+function drawingFor(name: IconName) {
+  switch (name) {
+    case 'home': return drawings.home;
+    case 'catalog': return drawings.catalog;
+    case 'agenda': return drawings.agenda;
+    case 'cart': return drawings.cart;
+    case 'profile': return drawings.profile;
+    case 'search': return drawings.search;
+    case 'chevron-right': return drawings['chevron-right'];
+    case 'chevron-left': return drawings['chevron-left'];
+    case 'service': return drawings.service;
+    case 'course': return drawings.course;
+    case 'product': return drawings.product;
+    case 'close': return drawings.close;
+    case 'filter': return drawings.filter;
+    case 'bell': return drawings.bell;
+    case 'heart': return drawings.heart;
+    case 'settings': return drawings.settings;
+  }
+}
+
 export function Icon({ name, size = IconSizes.medium, color }: { name: IconName; size?: number; color?: string }) {
   const theme = useTheme();
   return <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color ?? theme.text} strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" accessible={false}>
-    {drawings[name]}
+    {drawingFor(name)}
   </Svg>;
 }

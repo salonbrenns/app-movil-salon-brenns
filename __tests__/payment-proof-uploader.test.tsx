@@ -36,27 +36,29 @@ beforeEach(() => { picker.mockReset(); });
 test('selecciona, valida y confirma un comprobante después de que el servidor responde', async () => {
   picker.mockResolvedValue({ canceled: false, assets: [proof] });
   const upload = jest.fn().mockResolvedValue(undefined);
-  await render(<PaymentProofUploader onUpload={upload} />);
-  await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Seleccionar archivo' })); });
-  await waitFor(() => expect(screen.getByText('pago.pdf')).toBeTruthy());
-  await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Enviar comprobante' })); });
-  await waitFor(() => expect(upload).toHaveBeenCalledWith(proof));
-  await waitFor(() => expect(screen.getByText('Comprobante recibido por el servidor.')).toBeTruthy());
+  return render(<PaymentProofUploader onUpload={upload} />).then(async () => {
+    await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Seleccionar archivo' })); });
+    await waitFor(() => { expect(screen.getByText('pago.pdf')).toBeTruthy(); });
+    await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Enviar comprobante' })); });
+    await waitFor(() => { expect(upload).toHaveBeenCalledWith(proof); });
+    await waitFor(() => { expect(screen.getByText('Comprobante recibido por el servidor.')).toBeTruthy(); });
+  });
 });
 
 test('muestra errores de selección y envío, y permite reintentar', async () => {
   picker.mockResolvedValueOnce({ canceled: false, assets: [{ ...proof, name: 'falso.txt' }] })
     .mockResolvedValueOnce({ canceled: false, assets: [proof] });
   const upload = jest.fn().mockRejectedValueOnce(new Error('Error del servidor')).mockResolvedValueOnce(undefined);
-  await render(<PaymentProofUploader onUpload={upload} />);
-  await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Seleccionar archivo' })); });
-  await waitFor(() => expect(screen.getByText(/Selecciona un archivo JPG/)).toBeTruthy());
-  expect(screen.getByRole('button', { name: 'Enviar comprobante' }).props.accessibilityState.disabled).toBe(true);
-  await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Seleccionar archivo' })); });
-  await waitFor(() => expect(screen.getByText('pago.pdf')).toBeTruthy());
-  await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Enviar comprobante' })); });
-  await waitFor(() => expect(screen.getByText('Error del servidor')).toBeTruthy());
-  await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Enviar comprobante' })); });
-  await waitFor(() => expect(screen.getByText('Comprobante recibido por el servidor.')).toBeTruthy());
-  expect(upload).toHaveBeenCalledTimes(2);
+  return render(<PaymentProofUploader onUpload={upload} />).then(async () => {
+    await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Seleccionar archivo' })); });
+    await waitFor(() => { expect(screen.getByText(/Selecciona un archivo JPG/)).toBeTruthy(); });
+    expect(screen.getByRole('button', { name: 'Enviar comprobante' }).props.accessibilityState.disabled).toBe(true);
+    await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Seleccionar archivo' })); });
+    await waitFor(() => { expect(screen.getByText('pago.pdf')).toBeTruthy(); });
+    await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Enviar comprobante' })); });
+    await waitFor(() => { expect(screen.getByText('Error del servidor')).toBeTruthy(); });
+    await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Enviar comprobante' })); });
+    await waitFor(() => { expect(screen.getByText('Comprobante recibido por el servidor.')).toBeTruthy(); });
+    expect(upload).toHaveBeenCalledTimes(2);
+  });
 });
