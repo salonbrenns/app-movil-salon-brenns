@@ -49,23 +49,31 @@ export function instant(
 // Convertir importes a centavos sin redondeos
 export function cents(value: string | number): bigint {
   const amount = decimal(value, 'importe');
-
-  const match = /^(-?)(\d+)(?:\.(\d{1,2}))?$/.exec(amount);
-
-  if (!match) {
-    throw new AdapterError(
-      'importe',
-      'un importe con centavos exactos'
-    );
+  const invalid = () => new AdapterError('importe', 'un importe con centavos exactos');
+  let index = amount[0] === '-' ? 1 : 0;
+  const negative = index === 1;
+  const unitsStart = index;
+  while (index < amount.length) {
+    const digit = amount.charCodeAt(index) - 48;
+    if (digit < 0 || digit > 9) break;
+    index++;
   }
-
-  const [, sign, units, fraction = ''] = match;
-
-  const result =
-    BigInt(units) * 100n +
-    BigInt(fraction.padEnd(2, '0'));
-
-  return sign === '-' ? -result : result;
+  if (index === unitsStart) throw invalid();
+  const unitsEnd = index;
+  let fraction = 0n;
+  if (index < amount.length) {
+    if (amount[index++] !== '.' || index === amount.length) throw invalid();
+    const remaining = amount.length - index;
+    if (remaining > 2) throw invalid();
+    while (index < amount.length) {
+      const digit = amount.charCodeAt(index++) - 48;
+      if (digit < 0 || digit > 9) throw invalid();
+      fraction = fraction * 10n + BigInt(digit);
+    }
+    if (remaining === 1) fraction *= 10n;
+  }
+  const result = BigInt(amount.slice(unitsStart, unitsEnd)) * 100n + fraction;
+  return negative ? -result : result;
 }
 
 // Convertir centavos a pesos

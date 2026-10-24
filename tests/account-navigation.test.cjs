@@ -35,3 +35,19 @@ test('Mis cursos requires a confirmed session before rendering its account secti
  status = 'authenticated'; result=CuentaView(); assert.equal(result.type,'Screen'); assert.equal(result.props.children.props.destino.modulo,'cursos');
  assert.equal(result.props.backHref, '/perfil');
 });
+
+test('Configuración waits for authentication and preserves the requested destination', () => {
+ seccion = 'configuracion'; status = 'loading';
+ let result = CuentaView();
+ assert.equal(result.type, 'Screen');
+ assert.equal(result.props.children.type, 'LoadingState');
+ status = 'anonymous'; result = CuentaView();
+ assert.equal(result.type, 'Redirect');
+ assert.equal(result.props.href.params.returnTo, '/cuenta/configuracion');
+ status = 'authenticated'; result = CuentaView();
+ assert.equal(result.type, 'Screen');
+ assert.equal(result.props.children.props.destino.seccion, 'configuracion');
+ seccion = 'apariencia'; status = 'anonymous'; result = CuentaView();
+ assert.equal(result.type, 'Redirect');
+ assert.equal(result.props.href.params.returnTo, '/cuenta/apariencia');
+});

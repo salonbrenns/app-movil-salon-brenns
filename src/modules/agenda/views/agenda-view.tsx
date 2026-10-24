@@ -34,12 +34,12 @@ export default function ScheduleScreen() {
         {cita.notas ? <ThemedText type="small">{cita.notas}</ThemedText> : null}
         {cita.comprobanteRecibido ? <ThemedText type="small" themeColor="primary">Comprobante recibido</ThemedText> : cita.estado === 'PENDIENTE' ? <PaymentProofUploader onUpload={(asset) => vm.enviarComprobante(cita.id, asset)} /> : null}
         {['PENDIENTE', 'CONFIRMADA'].includes(cita.estado) ? <>
-          <Button label="Cancelar cita" variant="secondary" disabled={vm.ocupado || Date.parse(cita.fecha) - vm.now < 86400000} onPress={() => setCancelId(cita.id)} />
+          <Button label="Cancelar cita" variant="secondary" disabled={vm.ocupado || Date.parse(cita.fecha) - vm.now < 86400000} onPress={() => { setCancelId(cita.id); }} />
           {cancelId === cita.id ? <ThemedView surface="card" style={styles.section}>
             <ThemedText type="label">¿Confirmas que deseas cancelar esta cita?</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">El servidor comprobará si el estado permite cancelarla.</ThemedText>
             <Button label="Sí, cancelar cita" disabled={vm.ocupado} onPress={() => { setCancelId(null); void vm.cancelar(cita.id); }} />
-            <Button label="Conservar cita" variant="secondary" onPress={() => setCancelId(null)} />
+            <Button label="Conservar cita" variant="secondary" onPress={() => { setCancelId(null); }} />
           </ThemedView> : null}
         </> : null}</> : null}
       </ThemedView>

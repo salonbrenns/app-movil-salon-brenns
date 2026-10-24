@@ -12,7 +12,7 @@ export function RecuperacionView({ token, nueva = false }: { token?: string; nue
   return <View style={styles.form}>
     {nueva ? <>
       <ThemedText type="small" themeColor="textSecondary">Crea una contraseña para tu cuenta desde el enlace de recuperación.</ThemedText>
-      <CustomInput label="Nueva contraseña" value={vm.password} onChangeText={vm.setPassword} secureTextEntry={!vm.visible} onTogglePassword={() => vm.setVisible(!vm.visible)} autoComplete="new-password" editable={!vm.ocupado} />
+      <CustomInput label="Nueva contraseña" value={vm.password} onChangeText={vm.setPassword} secureTextEntry={!vm.visible} onTogglePassword={() => { vm.setVisible(!vm.visible); }} autoComplete="new-password" editable={!vm.ocupado} />
       <CustomInput label="Confirmar contraseña" value={vm.confirmacion} onChangeText={vm.setConfirmacion} secureTextEntry={!vm.visible} autoComplete="new-password" editable={!vm.ocupado} />
       {vm.error ? <StatusMessage message={vm.error} /> : null}
       {vm.enviado ? <StatusMessage message="Contraseña actualizada. Ya puedes iniciar sesión." tone="success" /> : <Button label="Guardar contraseña" loading={vm.ocupado} disabled={vm.ocupado || !token} onPress={vm.guardar} />}

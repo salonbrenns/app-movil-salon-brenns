@@ -84,7 +84,7 @@ export function CatalogContent({
     <Screen title={title} backHref={backHref}>
       <View style={styles.searchRow}>
         <View style={styles.searchField}><SearchField placeholder="Buscar en esta categoría…" value={busqueda} onChangeText={cambiarBusqueda} /></View>
-        <Touchable accessibilityRole="button" accessibilityLabel="Abrir filtros" onPress={() => setFiltrosAbiertos(true)} style={styles.filterButton}>
+        <Touchable accessibilityRole="button" accessibilityLabel="Abrir filtros" onPress={() => { setFiltrosAbiertos(true); }} style={styles.filterButton}>
           <Icon name="filter" color={Colors.primary} />
         </Touchable>
       </View>
@@ -99,7 +99,7 @@ export function CatalogContent({
         {!hideCategory ? <SectionHeading title={categoriaSeleccionada} /> : null}
         {!cargando && !error ? <View style={styles.metaRow}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.grow}>{count} {count === 1 ? 'resultado' : 'resultados'}</ThemedText>
-          {categoriaSeleccionada === 'Productos' ? <Touchable accessibilityRole="button" accessibilityLabel={`Ordenar productos: ${ordenProducto}`} onPress={() => setFiltrosAbiertos(true)} style={styles.orderButton}>
+          {categoriaSeleccionada === 'Productos' ? <Touchable accessibilityRole="button" accessibilityLabel={`Ordenar productos: ${ordenProducto}`} onPress={() => { setFiltrosAbiertos(true); }} style={styles.orderButton}>
             <ThemedText type="smallBold" themeColor="textSecondary">{ordenProducto}</ThemedText><Icon name="filter" size={16} color={Colors.textSecondary} />
           </Touchable> : null}
         </View> : null}
@@ -143,7 +143,7 @@ export function CatalogContent({
           )
         ) : null}
       </View>
-      <FilterSheet visible={filtrosAbiertos} onClose={() => setFiltrosAbiertos(false)}>
+      <FilterSheet visible={filtrosAbiertos} onClose={() => { setFiltrosAbiertos(false); }}>
         <View style={styles.filterSection}>
           {categoriaSeleccionada === 'Servicios' ? <FilterSelector label="Categoría" options={filtrosServicio} selected={filtroServicio} onSelect={seleccionarFiltroServicio} /> : null}
           {categoriaSeleccionada === 'Cursos' ? <FilterSelector label="Nivel" options={filtrosCurso} selected={filtroCurso} onSelect={seleccionarFiltroCurso} /> : null}

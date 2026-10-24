@@ -12,7 +12,7 @@ export function ProductosListView({ productos, resetKey }: { productos: readonly
   const [gridWidth, setGridWidth] = useState(0);
   const { cardWidth } = getProductGridLayout(gridWidth, Spacing.two);
   return <>
-    <View style={styles.grid} onLayout={(event) => setGridWidth(event.nativeEvent.layout.width)}>{tarjetas.map(({ id, ...card }) => <View key={id} style={[styles.cell, { width: cardWidth ?? '100%' }]}><CatalogCard {...card} compact /></View>)}</View>
+    <View style={styles.grid} onLayout={(event) => { setGridWidth(event.nativeEvent.layout.width); }}>{tarjetas.map(({ id, ...card }) => <View key={id} style={[styles.cell, { width: cardWidth ?? '100%' }]}><CatalogCard {...card} compact /></View>)}</View>
     <PaginationControls {...pagination} />
   </>;
 }
