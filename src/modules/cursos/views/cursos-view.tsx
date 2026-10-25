@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { Link, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -9,20 +9,20 @@ import { InscripcionForm } from './inscripcion-form';
 import { EmptyState, ErrorState, LoadingState } from '@/components/feedback/async-states';
 import { Spacing } from '@/theme';
 import { useCursosViewModel } from '@/modules/cursos/viewmodels/use-cursos-view-model';
-import { Button } from '@/components/ui/button';
+import { CatalogContent } from '@/modules/catalogo/views/catalogo-view';
 
 export default function CoursesScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { curso, informacion, precio, cargando, error, recargar } = useCursosViewModel(id);
 
   if (!curso) {
-    if (!id) return <Screen title="Cursos"><EmptyState title="Explora los cursos disponibles" description="Consulta el catálogo para ver cursos publicados y sus precios." /><Link href="/catalogo?categoria=Cursos" asChild><Button label="Ver cursos" /></Link></Screen>;
+    if (!id) return <CatalogContent categoriaInicial="Cursos" title="Cursos" hideCategory backHref="/catalogo" />;
     return <Screen title="Curso" backHref="/catalogo"><>{cargando ? <LoadingState label="Cargando curso…" /> : null}{!cargando && error ? <ErrorState message={error} onRetry={recargar} /> : null}{!cargando && !error ? <EmptyState title="Curso no disponible" description="Vuelve al catálogo para explorar cursos." /> : null}</></Screen>;
   }
 
   return (
     <Screen title="Curso" backHref="/catalogo">
-      <MediaPlaceholder label={curso.nombre} source={curso.imagen} />
+      <MediaPlaceholder label={curso.nombre} source={curso.imagen} detail />
       <View style={styles.heading}>
         <ThemedText type="title" accessibilityRole="header">{curso.nombre}</ThemedText>
         {curso.descripcion ? <ThemedText themeColor="textSecondary">{curso.descripcion}</ThemedText> : null}

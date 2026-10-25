@@ -10,7 +10,5 @@ export function carritoResponse(value: unknown): DatosCarrito {
       precio: decimal(dto.precio_venta, 'carrito.precio_venta'), cantidad: integer(dto.cantidad, 'carrito.cantidad'), stock: integer(dto.stock, 'carrito.stock') };
   });
   const subtotal = items.reduce((sum, item) => sum + cents(item.precio) * BigInt(item.cantidad), 0n);
-  // Shipping rules confirmed in POST /api/pedidos. No fictitious discount.
-  const envio = items.length && subtotal < 150000n ? 10000n : 0n;
-  return { items, resumen: { subtotal: money(subtotal), envio: money(envio), total: money(subtotal + envio) } };
+  return { items, resumen: { subtotal: money(subtotal) } };
 }

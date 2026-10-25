@@ -1,17 +1,20 @@
 import '@/global.css';
 
 export const Colors = {
-  primary: '#ED4087',
-  primarySoft: '#FFE8F2',
-  inactive: '#8E888D',
+  primary: '#E4367E',
+  primarySoft: '#F9E7ED',
+  primaryFaint: '#FFF4F7',
+  inactive: '#6E686E',
   success: '#329D6A',
-  text: '#000000',
-  textSecondary: '#60646C',
-  background: '#ffffff',
-  backgroundElement: '#F0F0F3',
-  backgroundSelected: '#E0E1E6',
-  onPrimary: '#ffffff',
-  border: '#E0E1E6',
+  text: '#302B30',
+  textSecondary: '#777078',
+  background: '#FFFFFF',
+  backgroundElement: '#FFFFFF',
+  backgroundSelected: '#FFF4F7',
+  onPrimary: '#FFFFFF',
+  border: '#E9B6C8',
+  borderAccent: '#E9B6C8',
+  scrim: 'rgba(41, 38, 41, 0.34)',
 } as const;
 
 export type ThemeColor = keyof typeof Colors;
@@ -32,8 +35,8 @@ export const Spacing = {
 } as const;
 
 export const Radius = {
-  control: 12,
-  card: 16,
+  control: 14,
+  card: 18,
 } as const;
 
 export const Sizes = {
@@ -43,7 +46,7 @@ export const Sizes = {
   touchMinWidth: 44,
   borderWidth: 1,
   maxContentWidth: 800,
-  mediaHero: 180, mediaThumbnail: 72, mediaCardHeight: 88, categoryMinHeight: 88, avatar: 56, tabBarMinHeight: 64,
+  mediaHero: 280, mediaThumbnail: 76, mediaCardHeight: 160, categoryMinHeight: 88, avatar: 56, tabBarMinHeight: 64,
 } as const;
 
 // Use small icons inline, medium icons in controls, and large icons for emphasis.
@@ -92,7 +95,24 @@ export const NavigationFonts = {
 export const Surfaces = {
   screen: Colors.background,
   card: Colors.backgroundElement,
-  control: Colors.background,
+  control: Colors.backgroundElement,
+} as const;
+
+export const Shadows = {
+  card: {
+    shadowColor: Colors.text,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    elevation: 2,
+  },
+  control: {
+    shadowColor: Colors.text,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 7,
+    elevation: 1,
+  },
 } as const;
 
 export const ControlStates = {

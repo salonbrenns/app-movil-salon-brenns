@@ -19,10 +19,12 @@ describe('Reserva y calendario', () => {
     expect(money(12345n)).toBe('123.45');
     expect(money(1234567890123456789012345n)).toBe('12345678901234567890123.45');
     expect(cents('12345678901234567890123.45')).toBe(1234567890123456789012345n);
+    expect(cents('-00012.3')).toBe(-1230n);
+    expect(cents('0.09')).toBe(9n);
     expect(importeReserva('100.01', 'COMPLETO', 50)).toBe('100.01');
     expect(importeReserva('100.01', 'ANTICIPO', 50)).toBe('50.01');
     expect(() => importeReserva('-1.00', 'COMPLETO', 50)).toThrow();
-    for (const malformed of ['-', '.5', '1.', '1.234', '1e2', '1,00']) {
+    for (const malformed of ['-', '.5', '1.', '1.234', '1e2', '1,00', '12.3x', '1.000']) {
       expect(() => cents(malformed)).toThrow();
     }
     expect(() => importeReserva('9'.repeat(100_000) + 'x', 'COMPLETO', 50)).toThrow();

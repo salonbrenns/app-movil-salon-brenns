@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { Link, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 
 import { ThemedText } from '@/components/themed-text';
 import { Screen } from '@/components/ui/screen';
@@ -11,6 +11,7 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/feedback/asyn
 import { Spacing } from '@/theme';
 import { useServiciosViewModel } from '@/modules/servicios/viewmodels/use-servicios-view-model';
 import { Button } from '@/components/ui/button';
+import { CatalogContent } from '@/modules/catalogo/views/catalogo-view';
 
 export default function ServicesScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -18,13 +19,13 @@ export default function ServicesScreen() {
   const favorite = useFavoriteAction('Servicios', id);
 
   if (!servicio) {
-    if (!id) return <Screen title="Servicios"><EmptyState title="Explora los servicios disponibles" description="Consulta el catálogo para ver servicios publicados y sus precios." /><Link href="/catalogo?categoria=Servicios" asChild><Button label="Ver servicios" /></Link></Screen>;
+    if (!id) return <CatalogContent categoriaInicial="Servicios" title="Servicios" hideCategory backHref="/catalogo" />;
     return <Screen title="Detalle" backHref="/catalogo"><>{cargando ? <LoadingState label="Cargando servicio…" /> : null}{!cargando && error ? <ErrorState message={error} onRetry={recargar} /> : null}{!cargando && !error ? <EmptyState title="Servicio no disponible" description="Vuelve al catálogo para explorar servicios." /> : null}</></Screen>;
   }
 
   return (
     <Screen title="Detalle" backHref="/catalogo">
-      <MediaPlaceholder label={servicio.nombre} source={servicio.imagen} />
+      <MediaPlaceholder label={servicio.nombre} source={servicio.imagen} detail />
       <View style={styles.heading}>
         <ThemedText type="title" accessibilityRole="header">{servicio.nombre}</ThemedText>
         <ThemedText type="subtitle" themeColor="primary" style={styles.price}>{precio}</ThemedText>

@@ -14,7 +14,7 @@ export interface HttpClient {
 export type HttpRequestOptions = RequestOptions & Readonly<{
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   headers?: Record<string, string>;
-  body?: string;
+  body?: string | FormData;
   authenticated?: boolean;
 }>;
 export type FetchImplementation = 'expo/fetch' | 'react-native/whatwg-fetch' | 'injected-fetch' | 'global-fetch';

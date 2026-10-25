@@ -21,6 +21,7 @@ export default function AutenticacionView() {
       <View style={formStyles.form}>
         <TextField label="Correo electrónico" value={vm.campos.correo} onChangeText={vm.cambiarCorreo} error={vm.erroresCampos.correo} editable={!vm.cargando} placeholder="Tu correo electrónico" keyboardType="email-address" autoCapitalize="none" autoCorrect={false} autoComplete="email" returnKeyType="next" onSubmitEditing={() => password.current?.focus()} />
         <TextField ref={password} label="Contraseña" value={vm.campos.password} onChangeText={vm.cambiarPassword} error={vm.erroresCampos.password} editable={!vm.cargando} placeholder="••••••••" secureTextEntry={!vm.visibilidad.password} onTogglePassword={() => vm.alternarVisibilidad('password')} autoCapitalize="none" autoCorrect={false} autoComplete="current-password" returnKeyType="go" onSubmitEditing={() => { void vm.iniciarSesion(); }} />
+        <Link href="/cuenta/recuperar-contrasena" asChild><Touchable accessibilityRole="link" style={formStyles.centeredLink}><ThemedText type="label" themeColor="primary">¿Olvidaste tu contraseña?</ThemedText></Touchable></Link>
         {vm.error ? <StatusMessage message={vm.error} /> : null}
         <Button label="Iniciar sesión" disabled={vm.cargando} loading={vm.operacionPendiente === 'Acceso'} onPress={() => { void vm.iniciarSesion(); }} />
         {vm.correoVerificacion ? <VerificacionCorreo correo={vm.correoVerificacion} cargando={vm.cargando} reenviar={vm.reenviarVerificacion} /> : null}

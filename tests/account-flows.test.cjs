@@ -55,6 +55,16 @@ test('resource cancels old account data, ignores late results and loads the next
   current.cancel(); assert.equal(current.getSnapshot().datos, null);
 });
 
+test('anonymous home cannot load private agenda data through the session resource', async () => {
+  let requests = 0;
+  const agenda = new SessionResource(async () => { requests++; return [{ id: '1' }]; }, false, 'anonymous:0');
+  await agenda.cargar();
+  assert.equal(requests, 0);
+  assert.equal(agenda.getSnapshot().datos, null);
+  assert.equal(await agenda.ejecutar(async () => { requests++; }, 'Cita cancelada.'), false);
+  assert.equal(requests, 0);
+});
+
 
 test('resource suppresses duplicate mutations and refreshes only after server confirmation', async () => {
   let reads = 0, writes = 0;

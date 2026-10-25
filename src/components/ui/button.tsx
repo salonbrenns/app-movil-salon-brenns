@@ -2,7 +2,7 @@ import { forwardRef, type ReactNode } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, type PressableProps, type View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { ControlStates, Radius, Sizes, Spacing, Surfaces, Typography } from '@/constants/theme';
+import { ControlStates, Radius, Shadows, Sizes, Spacing, Surfaces, Typography } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 export type ButtonProps = PressableProps & {
@@ -36,13 +36,12 @@ export const Button = forwardRef<View, ButtonProps>(function Button(
             : state.pressed && !disabled
               ? ControlStates.secondaryPressedBackground
               : Surfaces.control,
-          borderColor: primary ? theme.primary : theme.border,
+          borderColor: primary ? theme.primary : theme.borderAccent,
           opacity: disabled
             ? ControlStates.opacity.disabled
-            : state.pressed
-              ? ControlStates.opacity.pressed
-              : ControlStates.opacity.default,
+            : ControlStates.opacity.default,
         },
+        state.pressed && !disabled ? { transform: [{ scale: 0.98 }] } : undefined,
         typeof style === 'function' ? style(state) : style,
       ]}>
       {icon}{loading ? <ActivityIndicator color={primary ? theme.onPrimary : theme.primary} /> : <ThemedText themeColor={primary ? 'onPrimary' : 'primary'} style={styles.label}>
@@ -62,6 +61,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.control,
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.two,
+    ...Shadows.control,
   },
   label: {
     ...Typography.action,
