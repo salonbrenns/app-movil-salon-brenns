@@ -4,6 +4,7 @@ export const NavigationSections = {
   authentication: { name: 'autenticacion', href: '/autenticacion', title: 'Autenticación' },
   courses: { name: 'cursos', href: '/cursos', title: 'Cursos' },
   catalog: { name: 'catalogo', href: '/catalogo', title: 'Catálogo' },
+  cart: { name: 'carrito', href: '/carrito', title: 'Carrito' },
   services: { name: 'servicios', href: '/servicios', title: 'Servicios' },
   schedule: { name: 'agenda', href: '/agenda', title: 'Agenda' },
   profile: { name: 'perfil', href: '/perfil', title: 'Perfil' },

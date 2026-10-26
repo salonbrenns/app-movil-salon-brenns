@@ -23,6 +23,8 @@ import {
 import { ProductosListView } from '@/modules/productos/views/productos-list-view';
 import { Colors, Radius, Shadows, Sizes, Spacing } from '@/theme';
 import { useCatalogoViewModel } from '@/modules/catalogo/viewmodels/use-catalogo-view-model';
+import { useFavoriteCollection } from '@/modules/favoritos/viewmodels/use-favorite-action';
+import { ResourceStatus } from '@/components/feedback/resource-status';
 
 export default function CatalogScreen() {
   const { categoria, q } = useLocalSearchParams<{
@@ -78,6 +80,7 @@ export function CatalogContent({
     filtroCurso,
     seleccionarFiltroCurso,
   } = useCatalogoViewModel(categoriaInicial, busquedaInicial);
+  const favorites = useFavoriteCollection(categoriaSeleccionada);
   const count = categoriaSeleccionada === 'Productos' ? productosFiltrados.length : tarjetas.length;
 
   return (
@@ -96,12 +99,10 @@ export function CatalogContent({
       /> : null}
 
       <View style={styles.section}>
+        <ResourceStatus {...favorites} cargando={false} />
         {!hideCategory ? <SectionHeading title={categoriaSeleccionada} /> : null}
         {!cargando && !error ? <View style={styles.metaRow}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.grow}>{count} {count === 1 ? 'resultado' : 'resultados'}</ThemedText>
-          {categoriaSeleccionada === 'Productos' ? <Touchable accessibilityRole="button" accessibilityLabel={`Ordenar productos: ${ordenProducto}`} onPress={() => { setFiltrosAbiertos(true); }} style={styles.orderButton}>
-            <ThemedText type="smallBold" themeColor="textSecondary">{ordenProducto}</ThemedText><Icon name="filter" size={16} color={Colors.textSecondary} />
-          </Touchable> : null}
         </View> : null}
         {!cargando && !error && (filtroServicio !== 'Todas' && categoriaSeleccionada === 'Servicios' || filtroCurso !== 'Todos' && categoriaSeleccionada === 'Cursos' || filtroProducto !== 'Todos' && categoriaSeleccionada === 'Productos' || ordenProducto !== 'Publicación' && categoriaSeleccionada === 'Productos') ? <ThemedText type="small" themeColor="primary">
           Filtros aplicados: {categoriaSeleccionada === 'Servicios' ? filtroServicio : categoriaSeleccionada === 'Cursos' ? filtroCurso : [filtroProducto !== 'Todos' ? filtroProducto : null, ordenProducto !== 'Publicación' ? ordenProducto : null].filter(Boolean).join(' · ')}
@@ -130,6 +131,7 @@ export function CatalogContent({
           categoriaSeleccionada === 'Productos' ? (
             <ProductosListView
               productos={productosFiltrados}
+              favorites={favorites}
               resetKey={JSON.stringify([
                 busqueda,
                 filtroProducto,
@@ -138,7 +140,7 @@ export function CatalogContent({
             />
           ) : (
             tarjetas.map(({ id, ...card }) => (
-              <CatalogCard key={id} {...card} />
+              <CatalogCard key={id} {...card} favorite={{ selected: favorites.isFavorite(id), disabled: favorites.authenticated && (favorites.cargando || !!favorites.error), busy: favorites.ocupado, onPress: () => favorites.toggle(id) }} />
             ))
           )
         ) : null}
@@ -167,6 +169,5 @@ const styles = StyleSheet.create({
   filterButton: { width: Sizes.controlMinHeight, height: Sizes.controlMinHeight, borderRadius: Radius.control, borderWidth: Sizes.borderWidth, borderColor: Colors.borderAccent, backgroundColor: Colors.backgroundElement, alignItems: 'center', justifyContent: 'center', ...Shadows.control },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
   grow: { flex: 1 },
-  orderButton: { flexDirection: 'row', alignItems: 'center', gap: Spacing.one, minHeight: Sizes.touchMinWidth, paddingHorizontal: Spacing.two, borderRadius: Radius.control, borderWidth: Sizes.borderWidth, borderColor: Colors.borderAccent, backgroundColor: Colors.backgroundElement, ...Shadows.control },
   filterSection: { gap: Spacing.two },
 });

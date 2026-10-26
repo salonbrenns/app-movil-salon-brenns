@@ -45,9 +45,9 @@ function drawingFor(name: IconName) {
   }
 }
 
-export function Icon({ name, size = IconSizes.medium, color }: { name: IconName; size?: number; color?: string }) {
+export function Icon({ name, size = IconSizes.medium, color, filled = false }: { name: IconName; size?: number; color?: string; filled?: boolean }) {
   const theme = useTheme();
-  return <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color ?? theme.text} strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" accessible={false}>
+  return <Svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? color ?? theme.text : 'none'} stroke={color ?? theme.text} strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" accessible={false}>
     {drawingFor(name)}
   </Svg>;
 }

@@ -14,6 +14,7 @@ import type { Servicio } from '@/modules/servicios/models/servicio';
 import { formatPrice } from '@/utils/format-price';
 import { StatusMessage } from '@/components/feedback/status-message';
 import { PaymentProofUploader } from '@/components/ui/payment-proof-uploader';
+import { TextLink } from '@/components/ui/text-link';
 export function ReservaForm({ servicio }: { servicio: Servicio }) {
   const vm = useReservaViewModel(servicio);
   if (!vm.authenticated) return <Link href={{ pathname: '/autenticacion', params: { returnTo: '/servicios?id=' + servicio.id } }} asChild><Button label="Inicia sesión para agendar" /></Link>;
@@ -38,7 +39,9 @@ export function ReservaForm({ servicio }: { servicio: Servicio }) {
       <DatosTransferencia datos={vm.transferencia.datos.banco} />
     </> : null}
     <ThemedText type="small" themeColor="textSecondary">La cita se registra como pendiente. El pago debe acreditarse antes de su confirmación.</ThemedText>
+    <ThemedText type="small" themeColor="textSecondary">Las cancelaciones de citas deben solicitarse con al menos 24 horas de anticipación. Fuera del plazo o por inasistencia, el anticipo puede no ser reembolsable, sin perjuicio de tus derechos legales.</ThemedText>
+    <TextLink href="/cuenta/politicas" label="Consultar política de cancelaciones" />
     <Button label={vm.cita ? 'Cita registrada' : 'Confirmar cita'} loading={vm.ocupado} disabled={!vm.puedeReservar} onPress={() => { void vm.reservar(); }} />
-    <Link href="/agenda" asChild><Button label="Ver mi agenda" variant="secondary" /></Link>
+    <TextLink href="/agenda" label="Ver mi agenda" />
   </View>;
 }

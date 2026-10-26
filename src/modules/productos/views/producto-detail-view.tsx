@@ -1,5 +1,5 @@
 import { Link, useLocalSearchParams } from 'expo-router';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Screen } from '@/components/ui/screen';
 import { ChoiceChips, InfoRow, MediaPlaceholder } from '@/components/ui/style-guide';
 import { EmptyState, ErrorState, LoadingState } from '@/components/feedback/async-states';
@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { ResourceStatus } from '@/components/feedback/resource-status';
 import { useCarritoProductoViewModel } from '../viewmodels/use-carrito-producto-view-model';
 import { useFavoriteAction } from '@/modules/favoritos/viewmodels/use-favorite-action';
+import { FavoriteButton } from '@/components/ui/favorite-button';
+import { Spacing } from '@/theme';
 
 export default function ProductoDetailView() {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -22,7 +24,11 @@ export default function ProductoDetailView() {
     {!cargando && !error && !producto ? <EmptyState title="Producto no disponible" description="Vuelve al catálogo para explorar los productos." /> : null}
     {producto ? <>
       <MediaPlaceholder label={producto.nombre} source={selected?.imagen ?? producto.imagen} detail />
-      <ThemedText type="title" accessibilityRole="header">{producto.nombre}</ThemedText>
+      <View style={styles.heading}>
+        <ThemedText type="title" accessibilityRole="header" style={styles.title}>{producto.nombre}</ThemedText>
+        <FavoriteButton title={producto.nombre} selected={favorite.selected} disabled={favorite.authenticated && (favorite.cargando || !!favorite.error)} busy={favorite.ocupado} onPress={favorite.toggle} />
+      </View>
+      <ResourceStatus {...favorite} cargando={false} />
       <InfoRow label="Precio" value={selected ? formatPrice(selected.precio) : producto.precio == null ? 'Precio no disponible' : formatPrice(producto.precio)} accent />
       {producto.descripcion ? <ThemedText themeColor="textSecondary">{producto.descripcion}</ThemedText> : null}
       {producto.marca ? <InfoRow label="Marca" value={producto.marca} /> : null}
@@ -30,14 +36,22 @@ export default function ProductoDetailView() {
       {producto.variantes.length > 0 ? <>
         <ThemedText type="subtitle" accessibilityRole="header">Variantes</ThemedText>
         <ChoiceChips options={producto.variantes.map((v) => ({ value: v.id, label: [v.presentacion, v.tono].filter(Boolean).join(' · ') || `Variante ${v.id}` }))} selected={variantId} onSelect={seleccionarVariante} />
-        {selected ? <View>
+        {selected ? <View style={styles.variantSummary}>
           <InfoRow label="Existencia" value={selected.stock > 0 ? `${selected.stock} disponibles` : 'Agotado'} />
           <ResourceStatus {...cart} />
-          {cart.authenticated ? <Button label="Agregar al carrito" loading={cart.ocupado} disabled={cart.ocupado || selected.stock <= 0} onPress={() => { void cart.agregar(); }} /> : <Link href={{ pathname: '/autenticacion', params: { returnTo: '/productos/' + id } }} asChild><Button label="Inicia sesión para agregar al carrito" /></Link>}
-          <Link href="/carrito" push asChild><Button label="Ver carrito" variant="secondary" /></Link>
+          <View style={styles.purchaseActions}>
+            {cart.authenticated ? <Button label="Agregar al carrito" loading={cart.ocupado} disabled={cart.ocupado || selected.stock <= 0} onPress={() => { void cart.agregar(); }} /> : <Link href={{ pathname: '/autenticacion', params: { returnTo: '/productos/' + id } }} asChild><Button label="Inicia sesión para agregar al carrito" /></Link>}
+            <Link href="/carrito" push asChild><Button label="Ver carrito" variant="secondary" /></Link>
+          </View>
         </View> : null}
       </> : null}
     </> : null}
-    {producto ? <><ResourceStatus {...favorite} /><Button label={favorite.label} variant="secondary" loading={favorite.ocupado} disabled={favorite.ocupado} onPress={favorite.toggle} /></> : null}
   </Screen>;
 }
+
+const styles = StyleSheet.create({
+  heading: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.two },
+  title: { flex: 1, minWidth: 0 },
+  variantSummary: { gap: Spacing.three },
+  purchaseActions: { gap: Spacing.three, paddingTop: Spacing.two },
+});

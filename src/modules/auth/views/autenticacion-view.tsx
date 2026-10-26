@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { Link } from 'expo-router';
-import { StyleSheet, View, type TextInput } from 'react-native';
+import { StyleSheet, View, type TextInputInstance } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { CustomButton as Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
@@ -15,7 +15,7 @@ import { VerificacionCorreo } from './verificacion-correo';
 
 export default function AutenticacionView() {
   const vm = useAutenticacionViewModel();
-  const password = useRef<TextInput>(null);
+  const password = useRef<TextInputInstance>(null);
   return (
     <Screen brand title="Bienvenida de nuevo" subtitle="Inicia sesión para continuar">
       <View style={formStyles.form}>

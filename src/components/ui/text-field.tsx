@@ -1,5 +1,5 @@
 import { forwardRef, useState } from 'react';
-import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
+import { StyleSheet, TextInput, View, type TextInputInstance, type TextInputProps } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Touchable } from '@/components/ui/touchable';
@@ -8,7 +8,7 @@ import { useTheme } from '@/hooks/use-theme';
 
 export type TextFieldProps = TextInputProps & { label: string; error?: string; onTogglePassword?: () => void };
 
-export const TextField = forwardRef<TextInput, TextFieldProps>(function TextField(
+export const TextField = forwardRef<TextInputInstance, TextFieldProps>(function TextField(
   { label, error, style, accessibilityLabel = label, editable = true, accessibilityState, onFocus, onBlur, onTogglePassword, secureTextEntry, ...props }, ref,
 ) {
   const theme = useTheme();

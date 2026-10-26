@@ -17,6 +17,6 @@ export function SeguridadView() {
     {vm.error ? <StatusMessage message={vm.error} /> : null}
     {vm.guardado ? <StatusMessage message="Contraseña actualizada." tone="success" /> : null}
     <Button label="Guardar contraseña" disabled={vm.ocupado} loading={vm.ocupado} onPress={() => { void vm.guardar(); }} />
-    <MenuRow label="Eliminar cuenta" href="/cuenta/eliminar-cuenta" destructive />
+    <MenuRow label="Solicitar eliminación de cuenta" href="/cuenta/eliminar-cuenta" destructive />
   </View>;
 }

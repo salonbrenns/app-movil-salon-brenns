@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Pressable, type PressableProps, type View } from 'react-native';
+import { Pressable, type PressableInstance, type PressableProps } from 'react-native';
 
 import { ControlStates, Sizes } from '@/theme';
 
@@ -7,7 +7,7 @@ import { ControlStates, Sizes } from '@/theme';
 // this component so Expo Router cannot flatten it into an empty style object.
 type TouchableProps = PressableProps & { selected?: boolean };
 
-export const Touchable = forwardRef<View, TouchableProps>(function Touchable(
+export const Touchable = forwardRef<PressableInstance, TouchableProps>(function Touchable(
   { style, disabled, selected, ...props },
   ref,
 ) {
