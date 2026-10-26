@@ -3,12 +3,12 @@ import { View, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { SupportContact } from '@/modules/legal/components/support-contact';
-import { legalDocuments, type LegalDocumentKey } from '@/modules/legal/data/documents';
+import { getLegalDocument, type LegalDocumentKey } from '@/modules/legal/data/documents';
 import { TextLink } from '@/components/ui/text-link';
 import { Spacing } from '@/theme';
 
 export function LegalDocumentView({ documentKey }: { documentKey: LegalDocumentKey }) {
-  const document = legalDocuments[documentKey];
+  const document = getLegalDocument(documentKey);
   return <View style={styles.page}>
     {document.status === 'approved' && document.version && document.updatedAt
       ? <ThemedText type="small" themeColor="textSecondary">Versión {document.version} · Última actualización: {document.updatedAt}</ThemedText>

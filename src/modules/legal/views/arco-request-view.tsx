@@ -17,7 +17,7 @@ export function ArcoRequestView() {
     <TextField label="Nombre completo" value={vm.name} onChangeText={vm.setName} autoComplete="name" />
     <TextField label="Correo para recibir respuesta" value={vm.email} onChangeText={vm.setEmail} keyboardType="email-address" autoCapitalize="none" autoComplete="email" />
     <ThemedText type="label">Derecho que deseas ejercer</ThemedText>
-    <ChoiceChips options={options} selected={vm.right} onSelect={(value) => vm.setRight(value as ArcoRight)} />
+    <ChoiceChips options={options} selected={vm.right} onSelect={(value) => { vm.setRight(value as ArcoRight); }} />
     <TextField label="Descripción de la solicitud" value={vm.description} onChangeText={vm.setDescription} multiline textAlignVertical="top" style={styles.multiline} />
     <TextField label="Datos involucrados, si corresponde" value={vm.dataDetails} onChangeText={vm.setDataDetails} multiline textAlignVertical="top" style={styles.multiline} />
     {vm.validation ? <ThemedText accessibilityRole="alert" themeColor="primary">{vm.validation}</ThemedText> : null}

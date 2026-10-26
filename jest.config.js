@@ -1,6 +1,5 @@
 module.exports = {
   preset: "jest-expo",
-  cacheDirectory: "<rootDir>/.expo/jest-cache",
   testMatch: ["**/__tests__/**/*.test.ts", "**/__tests__/**/*.test.tsx"],
 
   testEnvironmentOptions: {

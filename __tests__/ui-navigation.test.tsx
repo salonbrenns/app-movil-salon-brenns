@@ -11,11 +11,12 @@ test('Carrito usa la misma barra inferior y las pantallas de acceso mantienen el
   expect(showsBottomNavigation('/autenticacion')).toBe(false);
 });
 
-test('el corazón conserva un objetivo táctil accesible y ejecuta la acción de favorito', async () => {
+test('el corazón conserva un objetivo táctil accesible y ejecuta la acción de favorito', () => {
   const onPress = jest.fn();
-  await render(<FavoriteButton title="Curso de peinado" selected={false} onPress={onPress} />);
-  const button = screen.getByRole('button', { name: 'Agregar a favoritos: Curso de peinado' });
-  expect(button.props.accessibilityState.selected).toBe(false);
-  fireEvent.press(button);
-  expect(onPress).toHaveBeenCalledTimes(1);
+  return render(<FavoriteButton title="Curso de peinado" selected={false} onPress={onPress} />).then(async () => {
+    const button = screen.getByRole('button', { name: 'Agregar a favoritos: Curso de peinado' });
+    expect(button.props.accessibilityState.selected).toBe(false);
+    await fireEvent.press(button);
+    expect(onPress).toHaveBeenCalledTimes(1);
+  });
 });

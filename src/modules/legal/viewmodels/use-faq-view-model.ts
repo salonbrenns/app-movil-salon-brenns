@@ -4,6 +4,6 @@ export function useFaqViewModel() {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   return {
     expandedIndex,
-    toggle: (index: number) => setExpandedIndex((current) => current === index ? null : index),
+    toggle: (index: number) => { setExpandedIndex((current) => current === index ? null : index); },
   };
 }

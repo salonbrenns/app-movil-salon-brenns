@@ -1,4 +1,4 @@
-import { legalDocuments } from '@/modules/legal/data/documents';
+import { getLegalDocument, legalDocuments, type LegalDocumentKey } from '@/modules/legal/data/documents';
 import { faqs } from '@/modules/legal/data/faqs';
 import { act, renderHook } from '@testing-library/react-native';
 import { useFaqViewModel } from '@/modules/legal/viewmodels/use-faq-view-model';
@@ -6,7 +6,7 @@ import { emailDraftUri } from '@/modules/legal/services/email-draft';
 import { isProtectedPath } from '@/modules/auth/models/auth-navigation';
 import { PAGINAS_CUENTA } from '@/modules/cuenta/viewmodels/cuenta-state';
 
-const flatten = (key: keyof typeof legalDocuments) => legalDocuments[key].sections
+const flatten = (key: LegalDocumentKey) => getLegalDocument(key).sections
   .flatMap((section) => section.blocks)
   .flatMap((block) => block.kind === 'list' ? block.items ?? [] : block.text ?? [])
   .join(' ');
@@ -57,11 +57,10 @@ test('ofrece exactamente las cinco preguntas y respuestas solicitadas', () => {
   expect(faqs.every((faq) => faq.answer.length > 0)).toBe(true);
 });
 
-test('el acordeón permite abrir y cerrar una respuesta', async () => {
-  const { result } = await renderHook(useFaqViewModel);
+test('el acordeón permite abrir y cerrar una respuesta', () => renderHook(useFaqViewModel).then(async ({ result }) => {
   expect(result.current.expandedIndex).toBeNull();
   await act(async () => { result.current.toggle(0); });
   expect(result.current.expandedIndex).toBe(0);
   await act(async () => { result.current.toggle(0); });
   expect(result.current.expandedIndex).toBeNull();
-});
+}));
