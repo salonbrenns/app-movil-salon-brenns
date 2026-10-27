@@ -14,3 +14,7 @@ export type Curso = Readonly<{
   cupoMaximo?: number | null;
   inscritos?: number | null;
 }>;
+
+export function cursoFinalizado(curso: Curso, hoy: string): boolean {
+  return curso.fechaFin != null && curso.fechaFin < hoy;
+}

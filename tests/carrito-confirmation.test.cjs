@@ -23,7 +23,7 @@ test('a confirmed order cannot be submitted again before React renders the updat
     if (request === '@/utils/format-price') return { formatPrice: (value) => value };
     if (request === '@/modules/auth/viewmodels/auth-session-provider') return { useAuthSession: () => ({ sessionRevision: 1 }) };
     if (request === '@/shared/services/comprobante-service') return { HttpComprobanteService: class {} };
-    if (request === '@/shared/viewmodels/use-transferencia-view-model') return { useTransferenciaViewModel: () => ({}) };
+    if (request === '@/shared/viewmodels/use-transferencia-view-model') return { useTransferenciaViewModel: () => ({ datos: { banco: { banco: 'Banco', titular: 'Titular', cuenta: '1234567890', clabe: '111111111111111111' } }, error: null }) };
     return originalLoad.call(this, request, ...args);
   };
   let useCarritoViewModel;

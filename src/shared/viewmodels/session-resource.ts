@@ -5,6 +5,12 @@ import { SessionDataError } from '@/shared/adapters/session-data-error';
 
 export type OperationErrorKind = 'sesion' | 'permiso' | 'validacion' | 'servidor' | 'respuesta' | 'conexion';
 export function operationError(error: unknown): { kind: OperationErrorKind; message: string } {
+  if (error instanceof AdapterError) {
+    if (process.env.NODE_ENV === 'development') console.warn('[adaptador] Respuesta inválida', { campo: error.path, esperado: error.expected });
+    return { kind: 'respuesta', message: error.path.startsWith('config-sitio.')
+      ? 'Los datos bancarios aún no están configurados correctamente. Intenta más tarde.'
+      : 'No se pudo cargar la información. Intenta de nuevo.' };
+  }
   if (error instanceof InputError) return { kind: 'validacion', message: error.message };
   if (error instanceof SessionDataError) return { kind: 'sesion', message: error.message };
   if (error instanceof HttpError) {
@@ -13,7 +19,7 @@ export function operationError(error: unknown): { kind: OperationErrorKind; mess
     const fallback = kind === 'sesion' ? 'Tu sesión expiró. Inicia sesión de nuevo.' : kind === 'permiso' ? 'Tu cuenta no tiene permiso para esta acción.' : kind === 'servidor' ? 'El servidor no pudo completar la solicitud.' : 'Revisa los datos e intenta de nuevo.';
     return { kind, message: `${typeof body.error === 'string' ? body.error : fallback} [${error.path.split('?')[0]}; HTTP ${error.status}]` };
   }
-  return { kind: error instanceof AdapterError ? 'respuesta' : 'conexion', message: error instanceof AdapterError ? 'La respuesta recibida no pudo interpretarse. Intenta actualizar.' : error instanceof TypeError ? 'No fue posible conectar. Revisa tu conexión e intenta de nuevo.' : error instanceof Error ? error.message : 'No fue posible completar la solicitud.' };
+  return { kind: 'conexion', message: error instanceof TypeError ? 'No fue posible conectar. Revisa tu conexión e intenta de nuevo.' : error instanceof Error ? error.message : 'No fue posible completar la solicitud.' };
 }
 export type SessionResourceState<T> = Readonly<{ datos: T | null; estadoCarga: 'cargando' | 'listo' | 'error'; error: string | null; tipoError: OperationErrorKind | null; ocupado: boolean; mensaje: string | null }>;
 

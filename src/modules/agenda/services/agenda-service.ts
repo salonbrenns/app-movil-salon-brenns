@@ -16,7 +16,18 @@ export class HttpAgendaService {
   async reservar(servicioId: string, fecha: string, hora: string, importe: string, empleadoId?: string): Promise<ReservaCreada> {
     const total = Number(decimal(importe, 'total'));
     if (!Number.isFinite(total) || total < 0) throw new Error('Importe de reserva inválido.');
-    const result = await this.http.request('/api/citas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ servicio_id: apiId(servicioId), fecha: day(fecha), hora: hour(hora), metodo_pago: 'TRANSFERENCIA', total, ...(empleadoId ? { empleado_id: apiId(empleadoId) } : {}) }) });
+    let result;
+    try {
+      result = await this.http.request('/api/citas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ servicio_id: apiId(servicioId), fecha: day(fecha), hora: hour(hora), metodo_pago: 'TRANSFERENCIA', total, ...(empleadoId ? { empleado_id: apiId(empleadoId) } : {}) }) });
+    } catch (error) {
+      if (error instanceof TypeError) {
+        try {
+          const existing = (await this.listar()).find((item) => item.servicioId === servicioId && item.fecha.slice(0, 10) === fecha && item.hora === hora && item.total === importe && item.estado === 'PENDIENTE');
+          if (existing) return { id: existing.id, estado: 'PENDIENTE' };
+        } catch { /* Keep the original connection failure. */ }
+      }
+      throw error;
+    }
     const dto = record(result.body, 'reserva');
     if (result.status !== 201 || dto.success !== true) throw new Error('El servidor no confirmó la cita.');
     const cita = record(dto.cita, 'reserva.cita');

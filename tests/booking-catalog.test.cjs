@@ -9,6 +9,8 @@ const { HttpTransferenciaService } = require('@/shared/services/transferencia-se
 const { HttpInscripcionesService } = require('@/modules/cursos/services/inscripciones-service');
 const { adaptCursoDto } = require('@/modules/cursos/adapters/cursos-adapter');
 const { imageUri } = require('@/shared/viewmodels/media-state');
+const { carritoResponse } = require('@/modules/carrito/adapters/carrito-adapter');
+const { favoritosResponse } = require('@/modules/favoritos/adapters/favoritos-adapter');
 function fixture(handler) {
   const requests = [];
   const http = new FetchHttpClient(() => 'https://example.invalid', async (url, options) => {
@@ -21,20 +23,39 @@ function fixture(handler) {
 }
 function deferred() { let resolve; const promise = new Promise(done => { resolve = done; }); return { promise, resolve }; }
 
+test('cart keeps the valid product image from backend JSON, including arrays', () => {
+  const item = { id: 1, variante_id: 2, tono: null, presentacion: null, precio_venta: '25.00', cantidad: 1, stock: 3,
+    producto: { nombre: 'Producto', imagen: ['javascript:alert(1)', 'https://example.invalid/producto.jpg'] } };
+  assert.equal(carritoResponse([item]).items[0].imagen, 'https://example.invalid/producto.jpg');
+  assert.equal(carritoResponse([{ ...item, producto: { ...item.producto, imagen: null } }]).items[0].imagen, null);
+  assert.equal(carritoResponse([{ ...item, producto: { ...item.producto, imagen: 'file:///invalid.jpg' } }]).items[0].imagen, null);
+});
 
-test('bank data uses the explicitly approved source only when API keys are absent, and never mixes accounts', async () => {
-  const approved = transferenciaResponse({});
-  assert.deepEqual(approved.banco, bancoAprobado); assert.equal(approved.fuente, 'aprobada'); assert.equal(approved.anticipoPorcentaje, 50);
-  const api = transferenciaResponse({ banco_titular: 'Titular confirmado por API', banco_banco: 'Banco publicado', banco_clabe: '111111111111111111', anticipo_porcentaje: '25' });
-  assert.equal(api.fuente, 'api'); assert.equal(api.banco.cuenta, null); assert.equal(api.banco.celular, null); assert.equal(api.anticipoPorcentaje, 25);
+test('favorites keep product, service and course images and reject invalid URLs', () => {
+  const product = { id: 2, nombre: 'Producto', precio_min: '25.00', imagen: ['https://example.invalid/p.jpg'] };
+  const service = { id: 3, nombre: 'Servicio', precio_min: 50, imagen: 'https://example.invalid/s.jpg' };
+  const course = { id: 4, titulo: 'Curso', precio_total: '100.00', imagenes: ['bad', 'https://example.invalid/c.jpg'] };
+  assert.equal(favoritosResponse([{ id: 1, producto: product }], 'Productos')[0].imagen, product.imagen[0]);
+  assert.equal(favoritosResponse([{ id: 1, servicio: service }], 'Servicios')[0].imagen, service.imagen);
+  assert.equal(favoritosResponse({ cursos: [course] }, 'Cursos')[0].imagen, course.imagenes[1]);
+  assert.equal(favoritosResponse([{ id: 1, producto: { ...product, imagen: null } }], 'Productos')[0].imagen, null);
+  assert.equal(favoritosResponse({ cursos: [{ ...course, imagenes: ['file:///bad.jpg'] }] }, 'Cursos')[0].imagen, null);
+});
+
+
+test('bank data uses prior approved values only when the API omits every bank key', async () => {
+  assert.deepEqual(transferenciaResponse({}).banco, bancoAprobado);
+  assert.equal(transferenciaResponse({}).fuente, 'aprobada');
+  const api = transferenciaResponse({ banco_titular: 'Titular confirmado por API', banco_banco: 'Banco publicado', banco_cuenta: '1234567890', banco_clabe: '111111111111111111', anticipo_porcentaje: '25' });
+  assert.equal(api.fuente, 'api'); assert.equal(api.banco.cuenta, '1234567890'); assert.equal(api.banco.celular, null); assert.equal(api.anticipoPorcentaje, 25);
   assert.throws(() => transferenciaResponse({ banco_banco: 'Configuración incompleta' }), AdapterError);
   assert.throws(() => transferenciaResponse({ anticipo_porcentaje: '200' }), AdapterError);
-  const f = fixture(() => ({})); await new HttpTransferenciaService(f.http).obtener();
+  const f = fixture(() => ({ banco_titular: 'Titular', banco_banco: 'Banco', banco_cuenta: '1234567890', banco_clabe: '111111111111111111' })); await new HttpTransferenciaService(f.http).obtener();
   assert.equal(f.requests[0].url.pathname, '/api/config-sitio');
 });
 
 test('enrollment retains the server IDs and full amount, suppresses duplicate submission and refreshes only after confirmation', async () => {
-  const pending = deferred(), f = fixture(() => pending.promise);
+  const pending = deferred(), f = fixture((request) => request.url.pathname.endsWith('/estado') ? { inscrito: false } : request.options.method === 'GET' ? { cursos: [] } : pending.promise);
   const service = new HttpInscripcionesService(f.http);
   let reads = 0, receipt = null;
   const vm = new SessionResource(async () => { reads++; return []; }, true);
@@ -43,12 +64,12 @@ test('enrollment retains the server IDs and full amount, suppresses duplicate su
   assert.equal(await vm.ejecutar(() => service.inscribir('5'), 'Duplicate'), false);
   pending.resolve({ success: true, inscripcionId: 6, pagoId: 7, monto: 250, metodoPago: 'TRANSFERENCIA', tipoPago: 'COMPLETO' });
   assert.equal(await first, true); assert.deepEqual(receipt, { inscripcionId: '6', pagoId: '7', monto: '250' });
-  assert.equal(reads, 2); assert.equal(f.requests.length, 1); assert.equal(f.requests[0].options.body, undefined);
+  assert.equal(reads, 2); assert.equal(f.requests.length, 3); assert.equal(f.requests[0].url.pathname, '/api/cursos/5/estado'); assert.equal(f.requests[1].url.pathname, '/api/mis-cursos'); assert.equal(f.requests[2].options.body, undefined);
 });
 
 test('enrollment duplicate/capacity/session errors preserve the server error and do not produce receipts', async () => {
   for (const [status, error] of [[409, 'Ya estás inscrito'], [409, 'El cupo del curso está completo'], [401, 'No autorizado']]) {
-    const f = fixture(() => new Response(JSON.stringify({ error }), { status }));
+    const f = fixture((request) => request.url.pathname.endsWith('/estado') ? { inscrito: false } : request.options.method === 'GET' ? { cursos: [] } : new Response(JSON.stringify({ error }), { status }));
     await assert.rejects(new HttpInscripcionesService(f.http).inscribir('5'), e => e instanceof HttpError && e.status === status && e.body.error === error);
   }
 });

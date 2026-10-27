@@ -19,12 +19,14 @@ function deferred() { let resolve; const promise = new Promise((done) => { resol
 
 
 test('enrollment confirms IDs and pending transfer contract, and empty Mis cursos is real', async () => {
-  const f = fixture((r) => r.options.method === 'GET' ? { cursos: [] } : { success: true, inscripcionId: 7, pagoId: 9, monto: 250, tipoPago: 'COMPLETO', metodoPago: 'TRANSFERENCIA' });
+  const f = fixture((r) => r.path.endsWith('/estado') ? { inscrito: false } : r.options.method === 'GET' ? { cursos: [] } : { success: true, inscripcionId: 7, pagoId: 9, monto: 250, tipoPago: 'COMPLETO', metodoPago: 'TRANSFERENCIA' });
   const service = new HttpInscripcionesService(f.http);
   assert.deepEqual(await service.listar(), []);
   assert.deepEqual(await service.inscribir('15'), { inscripcionId: '7', pagoId: '9', monto: '250' });
-  assert.equal(f.requests[1].path, '/api/cursos/15/inscribir');
-  assert.equal(f.requests[1].options.body, undefined);
+  assert.equal(f.requests[1].path, '/api/cursos/15/estado');
+  assert.equal(f.requests[2].path, '/api/mis-cursos');
+  assert.equal(f.requests[3].path, '/api/cursos/15/inscribir');
+  assert.equal(f.requests[3].options.body, undefined);
   const denied = new HttpInscripcionesService(fixture(() => new Response('{"error":"Solo clientes"}', { status: 403 })).http);
   await assert.rejects(denied.inscribir('15'), (error) => operationError(error).kind === 'permiso');
 });

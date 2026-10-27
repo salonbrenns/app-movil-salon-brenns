@@ -20,7 +20,9 @@ export class HttpVentasService {
 
     this.pending = true;
     try {
-      const result = await this.http.request('/api/pedidos', {
+      const startedAt = Date.now();
+      let result;
+      try { result = await this.http.request('/api/pedidos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -29,7 +31,15 @@ export class HttpVentasService {
           correo_cliente: perfil.correo,
           telefono_cliente: perfil.telefono,
         }),
-      });
+      }); } catch (error) {
+        if (error instanceof TypeError) {
+          try {
+            const created = (await this.listar()).filter((order) => Date.parse(order.fecha) >= startedAt - 10000);
+            if (created.length === 1) return { id: created[0].id, total: created[0].total };
+          } catch { /* Retain the original connection error. */ }
+        }
+        throw error;
+      }
       return pedidoCreadoResponse(result.body, 'transferencia');
     } finally {
       this.pending = false;

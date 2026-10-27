@@ -2,6 +2,7 @@ import { View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { InfoRow, MenuRow } from '@/components/ui/style-guide';
+import { accountSectionStyles as styles } from '@/components/ui/account-section-styles';
 import { ResourceStatus } from '@/components/feedback/resource-status';
 import { useMisCursosViewModel } from '../viewmodels/use-mis-cursos-view-model';
 import { formatPrice } from '@/utils/format-price';
@@ -15,7 +16,11 @@ export function MisCursosView() {
       {item.precio !== null ? <InfoRow label="Precio" value={formatPrice(item.precio)} /> : null}
       <InfoRow label="Pagado" value={formatPrice(item.totalPagado)} />
       <InfoRow label="Días asistidos" value={String(item.diasAsistidos)} />
-      {item.pagos.map((pago) => <View key={pago.id}><InfoRow label={'Pago #' + pago.id + ' · ' + pago.estado} value={formatPrice(pago.monto)} /></View>)}
+      {item.pagos.map((pago) => <View key={pago.id} style={styles.section}>
+        <InfoRow label={'Pago #' + pago.id + ' · ' + pago.estado} value={formatPrice(pago.monto)} />
+        {pago.comprobanteRecibido ? <ThemedText type="small" themeColor="textSecondary">Comprobante enviado correctamente.</ThemedText> : null}
+        {item.estado === 'ACTIVO' && pago.estado === 'PENDIENTE' && !pago.comprobanteRecibido ? <MenuRow label="Continuar al pago" href={{ pathname: '/pago', params: { tipo: 'curso', id: pago.id } }} /> : null}
+      </View>)}
       {item.cursoId ? <MenuRow label="Ver curso" href={{ pathname: '/cursos', params: { id: item.cursoId } }} /> : null}
     </ThemedView>)}
     <MenuRow label="Explorar cursos" href="/catalogo?categoria=Cursos" />

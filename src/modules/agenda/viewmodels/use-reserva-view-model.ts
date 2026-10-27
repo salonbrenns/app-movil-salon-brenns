@@ -47,10 +47,10 @@ export function useReservaViewModel(servicio: Servicio, empleadoId?: string) {
     cambiarHora: (next: string) => { if (horarios.some((slot) => slot.hora === next)) { change({ hora: next }); setConflict(null); } },
     cambiarTipoPago: (next: string) => { if (next === 'ANTICIPO' || next === 'COMPLETO') change({ tipoPago: next }); },
     puedeReservar,
-    reservar: () => puedeReservar && hora && importe ? vm.ejecutar(
+    reservar: (onCreated?: (id: string) => void) => puedeReservar && hora && importe ? vm.ejecutar(
       () => reservarConDisponibilidad(() => service.reservar(servicio.id, fecha, hora, importe, empleadoId), async () => { await Promise.all([vm.recargar(), dias.recargar()]); }, () => { setDraft((previous) => previous?.scope === scope && previous.fecha === fecha ? { ...previous, hora: null } : previous); setConflict({ scope, message: 'La disponibilidad cambió. Selecciona otra fecha u hora antes de confirmar.' }); }),
-      (result) => 'Cita #' + result.id + ' registrada. El pago por transferencia está pendiente.',
-      (result) => setReceipt({ scope, cita: result, fecha, hora, tipoPago, importe })) : Promise.resolve(false),
+      (result) => 'Cita #' + result.id + ' registrada.',
+      (result) => { setReceipt({ scope, cita: result, fecha, hora, tipoPago, importe }); onCreated?.(result.id); }) : Promise.resolve(false),
     enviarComprobante: async (asset: DocumentPickerAsset) => { if (!cita) throw new Error('Primero registra la cita.'); await comprobantes.subir('citas', cita.id, asset); setProofSent(scope); },
   };
 }

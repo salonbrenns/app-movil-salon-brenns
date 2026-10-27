@@ -326,10 +326,9 @@ test("Mis cursos displays only server-reported payment states and accepts a miss
   ];
 
   for (const reply of respuestasInvalidas) {
+    const http = new FetchHttpClient(() => 'https://example.invalid', async (url, options) => new Response(JSON.stringify(new URL(url).pathname.endsWith('/estado') ? { inscrito: false } : options.method === 'GET' ? { cursos: [] } : reply)));
     await assert.rejects(
-      new HttpInscripcionesService(
-        fixture(reply).http
-      ).inscribir("7")
+      new HttpInscripcionesService(http).inscribir("7")
     );
   }
 });
