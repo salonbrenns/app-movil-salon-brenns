@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { render, screen, userEvent } from '@testing-library/react-native';
 
 import { FavoriteButton } from '@/components/ui/favorite-button';
 import { BottomNavigationItems, showsBottomNavigation } from '@/constants/navigation';
@@ -13,10 +13,11 @@ test('Carrito usa la misma barra inferior y las pantallas de acceso mantienen el
 
 test('el corazón conserva un objetivo táctil accesible y ejecuta la acción de favorito', () => {
   const onPress = jest.fn();
+  const user = userEvent.setup();
   return render(<FavoriteButton title="Curso de peinado" selected={false} onPress={onPress} />).then(async () => {
     const button = screen.getByRole('button', { name: 'Agregar a favoritos: Curso de peinado' });
     expect(button.props.accessibilityState.selected).toBe(false);
-    await fireEvent.press(button);
+    await user.press(button);
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 });

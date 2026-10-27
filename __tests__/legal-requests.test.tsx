@@ -1,4 +1,4 @@
-import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react-native';
+import { act, render, renderHook, screen, userEvent, waitFor } from '@testing-library/react-native';
 import * as Linking from 'expo-linking';
 
 import { AccountDeletionView } from '@/modules/legal/views/account-deletion-view';
@@ -43,12 +43,13 @@ test('ARCO exige datos mínimos y sólo abre un borrador de correo codificado', 
 });
 
 test('eliminación requiere confirmación y ofrece el correo copiable cuando no hay app de correo', () => {
+  const user = userEvent.setup();
   openURL.mockRejectedValue(new Error('No mail app'));
   return render(<AccountDeletionView />).then(async () => {
     expect(openURL).not.toHaveBeenCalled();
-    await act(async () => { await fireEvent.press(screen.getByRole('button', { name: 'Solicitar eliminación de cuenta' })); });
+    await user.press(screen.getByRole('button', { name: 'Solicitar eliminación de cuenta' }));
     expect(screen.getByText('¿Deseas preparar una solicitud de eliminación?')).toBeTruthy();
-    await act(async () => { await fireEvent.press(screen.getByRole('button', { name: 'Sí, preparar solicitud' })); });
+    await user.press(screen.getByRole('button', { name: 'Sí, preparar solicitud' }));
     await waitFor(() => { expect(screen.getByText(/No se pudo abrir el correo/)).toBeTruthy(); });
     expect(screen.getByText(business.email).props.selectable).toBe(true);
     expect(openURL).toHaveBeenCalledTimes(1);
@@ -56,9 +57,10 @@ test('eliminación requiere confirmación y ofrece el correo copiable cuando no 
 });
 
 test('soporte informa el fallo del correo y conserva la dirección copiable', () => {
+  const user = userEvent.setup();
   openURL.mockRejectedValue(new Error('No mail app'));
   return render(<SupportContact />).then(async () => {
-    await fireEvent.press(screen.getByRole('button', { name: 'Contactar soporte' }));
+    await user.press(screen.getByRole('button', { name: 'Contactar soporte' }));
     await waitFor(() => { expect(screen.getByText(/No se pudo abrir la aplicación de correo/)).toBeTruthy(); });
     expect(screen.getByText(business.email).props.selectable).toBe(true);
     expect(openURL).toHaveBeenCalledWith(`mailto:${business.email}`);
