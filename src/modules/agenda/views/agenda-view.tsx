@@ -10,7 +10,6 @@ import { Touchable } from '@/components/ui/touchable';
 import { ResourceStatus } from '@/components/feedback/resource-status';
 import { Sizes, Spacing } from '@/theme';
 import { useAgendaViewModel } from '../viewmodels/use-agenda-view-model';
-import { PaymentProofUploader } from '@/components/ui/payment-proof-uploader';
 import { TextLink } from '@/components/ui/text-link';
 export default function ScheduleScreen() {
   const vm = useAgendaViewModel();
@@ -33,14 +32,14 @@ export default function ScheduleScreen() {
         {vm.detalleId === cita.id ? <>
         {cita.empleado ? <ThemedText type="small">{cita.empleado}</ThemedText> : null}
         {cita.notas ? <ThemedText type="small">{cita.notas}</ThemedText> : null}
-        {cita.comprobanteRecibido ? <ThemedText type="small" themeColor="primary">Comprobante recibido</ThemedText> : cita.estado === 'PENDIENTE' ? <PaymentProofUploader onUpload={(asset) => vm.enviarComprobante(cita.id, asset)} /> : null}
+        {cita.comprobanteRecibido ? <ThemedText type="small" themeColor="primary">Comprobante recibido</ThemedText> : cita.estado === 'PENDIENTE' ? <Link href={{ pathname: '/pago', params: { tipo: 'cita', id: cita.id } }} asChild><Button label="Continuar al pago" /></Link> : null}
         {['PENDIENTE', 'CONFIRMADA'].includes(cita.estado) ? <>
-          <ThemedText type="small" themeColor="textSecondary">Solicita la cancelación con al menos 24 horas de anticipación. El servidor confirmará si procede.</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">Solicita la cancelación con al menos 24 horas de anticipación.</ThemedText>
           <TextLink href="/cuenta/politicas" label="Consultar política de cancelaciones" />
           <Button label="Solicitar cancelación" variant="secondary" disabled={vm.ocupado} onPress={() => { setCancelId(cita.id); }} />
           {cancelId === cita.id ? <ThemedView surface="card" style={styles.section}>
             <ThemedText type="label">¿Confirmas que deseas cancelar esta cita?</ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">La política solicita al menos 24 horas de anticipación. El servidor determinará si procede. Esta acción no procesa reembolsos.</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">La política solicita al menos 24 horas de anticipación. Esta acción no procesa reembolsos.</ThemedText>
             <Button label="Sí, cancelar cita" disabled={vm.ocupado} onPress={() => { setCancelId(null); void vm.cancelar(cita.id); }} />
             <Button label="Conservar cita" variant="secondary" onPress={() => { setCancelId(null); }} />
           </ThemedView> : null}

@@ -95,12 +95,14 @@ export function useCarritoViewModel() {
         'Carrito vaciado.'
       ),
 
-    confirmarPedido: () => {
+    confirmarPedido: (onCreated?: (id: string) => void) => {
       const perfil = profile.perfil;
 
       if (
         !perfil ||
         !existenciasValidas ||
+        !transferencia.datos ||
+        !!transferencia.error ||
         lastOrderRef.current?.revision === sessionRevision
       ) {
         return Promise.resolve(false);
@@ -113,7 +115,7 @@ export function useCarritoViewModel() {
           pedido.id +
           ' registrado. Total: ' +
           formatPrice(pedido.total) +
-          '. Pago pendiente de validación.',
+          '.',
         (order) => {
           const confirmed = {
             revision: sessionRevision,
@@ -122,6 +124,7 @@ export function useCarritoViewModel() {
 
           lastOrderRef.current = confirmed;
           setLastOrder(confirmed);
+          onCreated?.(order.id);
         }
       );
     },

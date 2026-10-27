@@ -1,15 +1,16 @@
+import { Link } from 'expo-router';
 import { View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Button } from '@/components/ui/button';
-import { InfoRow, SegmentedControl } from '@/components/ui/style-guide';
+import { InfoRow, MediaPlaceholder, SegmentedControl } from '@/components/ui/style-guide';
 import { ResourceStatus } from '@/components/feedback/resource-status';
 import { accountSectionStyles as styles } from '@/components/ui/account-section-styles';
 import { useComprasViewModel } from '../viewmodels/use-compras-view-model';
 import { formatPrice } from '@/utils/format-price';
-import { PaymentProofUploader } from '@/components/ui/payment-proof-uploader';
 import { useScreenBackAction } from '@/components/ui/screen';
 import { StorePickupInfo } from '@/modules/legal/components/store-pickup-info';
+import { Sizes, Spacing } from '@/theme';
 
 export function ComprasView() {
   const vm = useComprasViewModel();
@@ -25,9 +26,12 @@ export function ComprasView() {
       <Button label={vm.detalle === pedido.id ? 'Ocultar detalle' : 'Ver detalle'} variant="secondary" onPress={() => vm.setDetalle(vm.detalle === pedido.id ? null : pedido.id)} />
       {vm.detalle === pedido.id ? <View style={styles.section}>
         <StorePickupInfo />
-        {pedido.detalles.map(item => <View key={item.id}><ThemedText type="smallBold">{item.nombre} × {item.cantidad}</ThemedText>{item.variante ? <ThemedText type="small" themeColor="textSecondary">{item.variante}</ThemedText> : null}<ThemedText type="small">{formatPrice(item.subtotal)}</ThemedText></View>)}
-        <ThemedText type="small" themeColor="textSecondary">{pedido.comprobanteRecibido ? 'Comprobante recibido; el estado del pago depende de la revisión del servidor.' : 'Comprobante pendiente de envío.'}</ThemedText>
-        {!pedido.comprobanteRecibido && !['ENTREGADO', 'CANCELADO'].includes(pedido.estado) ? <PaymentProofUploader onUpload={(asset) => vm.enviarComprobante(pedido.id, asset)} /> : null}
+        {pedido.detalles.map(item => <View key={item.id} style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
+          <View style={{ width: Sizes.mediaThumbnail }}><MediaPlaceholder compact source={item.imagen} label={item.nombre} product /></View>
+          <View style={{ flex: 1 }}><ThemedText type="smallBold">{item.nombre} × {item.cantidad}</ThemedText>{item.variante ? <ThemedText type="small" themeColor="textSecondary">{item.variante}</ThemedText> : null}<ThemedText type="small">{formatPrice(item.subtotal)}</ThemedText></View>
+        </View>)}
+        <ThemedText type="small" themeColor="textSecondary">{pedido.comprobanteRecibido ? 'Comprobante enviado correctamente.' : 'Comprobante pendiente de envío.'}</ThemedText>
+        {!pedido.comprobanteRecibido && pedido.estado === 'PENDIENTE' ? <Link href={{ pathname: '/pago', params: { tipo: 'pedido', id: pedido.id } }} asChild><Button label="Continuar al pago" /></Link> : null}
       </View> : null}
     </ThemedView>)}
   </View>;

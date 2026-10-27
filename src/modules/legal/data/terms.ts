@@ -72,11 +72,11 @@ export const termsDocument: LegalDocument = {
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "El flujo móvil utiliza únicamente transferencia bancaria. La aplicación muestra los datos bancarios correspondientes y permite adjuntar comprobantes para pedidos y citas. El comprobante recibido será revisado; su recepción y la aprobación del pago son estados distintos."
+          "text": "El flujo móvil utiliza únicamente transferencia bancaria. La aplicación muestra los datos bancarios correspondientes y permite adjuntar comprobantes para pedidos, citas y cursos. La recepción de un comprobante no implica por sí sola la aprobación del pago."
         },
         {
           "kind": "paragraph",
-          "text": "La carga de comprobantes de cursos requiere un contrato de API confirmado y aún no está disponible en la app."
+          "text": "Puedes consultar el estado de la operación en Mis compras, Mis citas o Mis cursos, según corresponda."
         }
       ]
     },

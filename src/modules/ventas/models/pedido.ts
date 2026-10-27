@@ -4,5 +4,5 @@ export type Pedido = Readonly<{
   total: string;
   fecha: string;
   comprobanteRecibido: boolean;
-  detalles: readonly { id: string; nombre: string; variante: string | null; cantidad: number; subtotal: string }[];
+  detalles: readonly { id: string; nombre: string; variante: string | null; cantidad: number; subtotal: string; imagen: string | null }[];
 }>;

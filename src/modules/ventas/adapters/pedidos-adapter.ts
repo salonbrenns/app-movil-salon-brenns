@@ -2,6 +2,7 @@ import { identifier, list, nullableText, record, text } from '@/shared/adapters/
 import { instant, integer } from '@/shared/adapters/account-validation';
 import type { Pedido } from '../models/pedido';
 import { totalEnPesos } from './ventas-adapter';
+import { imageUri } from '@/shared/viewmodels/media-state';
 
 export function pedidosResponse(value: unknown): readonly Pedido[] {
   return list(value, 'pedidos').map((entry) => {
@@ -14,7 +15,7 @@ export function pedidosResponse(value: unknown): readonly Pedido[] {
       comprobanteRecibido: !!nullableText(dto.comprobante_url, 'pedido.comprobante_url'),
       detalles: list(dto.detalles, 'pedido.detalles').map((entryDetail) => {
         const detail = record(entryDetail, 'pedido.detalle');
-        return { id: identifier(detail.id, 'pedido.detalle.id'), nombre: text(detail.nombre_producto, 'pedido.detalle.nombre_producto'), variante: nullableText(detail.descripcion_variante, 'pedido.detalle.descripcion_variante'), cantidad: integer(detail.cantidad, 'pedido.detalle.cantidad', 1), subtotal: totalEnPesos(detail.subtotal) };
+        return { id: identifier(detail.id, 'pedido.detalle.id'), nombre: text(detail.nombre_producto, 'pedido.detalle.nombre_producto'), variante: nullableText(detail.descripcion_variante, 'pedido.detalle.descripcion_variante'), cantidad: integer(detail.cantidad, 'pedido.detalle.cantidad', 1), subtotal: totalEnPesos(detail.subtotal), imagen: imageUri(detail.imagen) ?? null };
       }),
     };
   });

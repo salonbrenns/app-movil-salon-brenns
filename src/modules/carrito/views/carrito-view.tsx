@@ -1,4 +1,4 @@
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
 import { ErrorState } from "@/components/feedback/async-states";
@@ -7,7 +7,6 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Button } from "@/components/ui/button";
 import { DatosTransferencia } from "@/components/ui/datos-transferencia";
-import { PaymentProofUploader } from "@/components/ui/payment-proof-uploader";
 import { Screen } from "@/components/ui/screen";
 import { TextLink } from '@/components/ui/text-link';
 import { InfoRow, MediaPlaceholder } from "@/components/ui/style-guide";
@@ -32,24 +31,22 @@ export default function CarritoView() {
           <InfoRow label="Número" value={"#" + vm.pedidoRegistrado.id} />
 
           <InfoRow
-            label="Total informado por el servidor"
+            label="Total"
             value={formatPrice(vm.pedidoRegistrado.total)}
             accent
           />
 
           <ThemedText type="small" themeColor="textSecondary">
             {vm.comprobanteEnviado
-              ? "Comprobante recibido; el pago sigue pendiente de revisión."
-              : "La transferencia y el pago siguen pendientes de validación. Adjunta tu comprobante."}
+              ? "Comprobante enviado correctamente."
+              : "Adjunta el comprobante de transferencia para completar este paso."}
           </ThemedText>
 
           {vm.transferencia.datos && !vm.transferencia.error ? (
             <DatosTransferencia datos={vm.transferencia.datos.banco} />
           ) : null}
 
-          {!vm.comprobanteEnviado ? (
-            <PaymentProofUploader onUpload={vm.enviarComprobante} />
-          ) : null}
+          {!vm.comprobanteEnviado ? <Link href={{ pathname: '/pago', params: { tipo: 'pedido', id: vm.pedidoRegistrado.id } }} asChild><Button label="Continuar al pago" /></Link> : null}
         </ThemedView>
       ) : null}
 
@@ -65,7 +62,7 @@ export default function CarritoView() {
         {vm.items.map((item) => (
           <ThemedView key={item.id} surface="card" style={styles.item}>
             <View style={styles.thumbnail}>
-              <MediaPlaceholder compact />
+              <MediaPlaceholder compact source={item.imagen} label={item.titulo} product />
             </View>
 
             <View style={styles.description}>
@@ -130,7 +127,7 @@ export default function CarritoView() {
               value={formatPrice(vm.resumen.subtotal)}
             />
 
-            <ThemedText type="small" themeColor="textSecondary">El total definitivo del pedido se confirma en el servidor al registrarlo.</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">Revisa el total antes de continuar.</ThemedText>
           </ThemedView>
 
           <Button
@@ -189,17 +186,20 @@ export default function CarritoView() {
 
           {/* Evitar confirmar nuevamente un pedido registrado */}
           <Button
-            label="Confirmar pedido"
+            label="Pagar"
             loading={vm.ocupado}
             disabled={
               !vm.perfil ||
               !vm.existenciasValidas ||
+              !vm.transferencia.datos ||
+              !!vm.transferencia.error ||
+              vm.transferencia.cargando ||
               vm.cargando ||
               vm.ocupado ||
               !!vm.pedidoRegistrado
             }
             onPress={() => {
-              void vm.confirmarPedido();
+              void vm.confirmarPedido((id) => router.push({ pathname: '/pago', params: { tipo: 'pedido', id } }));
             }}
           />
         </>

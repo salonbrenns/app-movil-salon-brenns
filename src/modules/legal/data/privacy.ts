@@ -79,12 +79,12 @@ export const privacyDocument: LegalDocument = {
           "kind": "list",
           "items": [
             "Referencias de operación y estado de revisión cuando estén disponibles.",
-            "Imágenes o documentos de comprobantes de transferencia enviados para pedidos y citas, incluidos los datos personales que contengan."
+            "Imágenes o documentos de comprobantes de transferencia enviados para pedidos, citas y cursos, incluidos los datos personales que contengan."
           ]
         },
         {
           "kind": "paragraph",
-          "text": "La aplicación no solicita direcciones particulares de entrega. La carga de comprobantes de cursos no está disponible en el contrato móvil actual y requiere integración confirmada."
+          "text": "La aplicación no solicita direcciones particulares de entrega."
         }
       ]
     },

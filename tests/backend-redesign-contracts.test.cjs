@@ -1,9 +1,22 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
+const Module = require('node:module');
 
 const { HttpAuthService } = require('@/modules/auth/services/auth-service');
 const { pedidosResponse } = require('@/modules/ventas/adapters/pedidos-adapter');
-const { HttpComprobanteService, comprobanteType } = require('@/shared/services/comprobante-service');
+const originalLoad = Module._load;
+Module._load = function(request, ...args) {
+  if (request === 'expo-crypto') return { randomUUID: require('node:crypto').randomUUID };
+  if (request === 'expo-file-system') return { File: class {}, Directory: class {}, Paths: {} };
+  if (request === 'expo/fetch') return { fetch: global.fetch };
+  return originalLoad.call(this, request, ...args);
+};
+let HttpComprobanteService, comprobanteType;
+try {
+  ({ HttpComprobanteService, comprobanteType } = require('@/shared/services/comprobante-service'));
+} finally {
+  Module._load = originalLoad;
+}
 
 test('password recovery and reset use the verified email-link endpoints', async () => {
   const calls = [];
@@ -19,12 +32,13 @@ test('password recovery and reset use the verified email-link endpoints', async 
 
 test('order history preserves server status, total, proof and line items', () => {
   const orders = pedidosResponse([{ id: 7, estado: 'PENDIENTE', total: 750, fecha_pedido: '2026-10-20T12:00:00.000Z', comprobante_url: null,
-    detalles: [{ id: 9, nombre_producto: 'Sérum', descripcion_variante: null, cantidad: 2, subtotal: 640 }] }]);
+    detalles: [{ id: 9, nombre_producto: 'Sérum', descripcion_variante: null, cantidad: 2, subtotal: 640, imagen: ['bad', 'https://example.invalid/serum.jpg'] }] }]);
   assert.equal(orders[0].id, '7');
   assert.equal(orders[0].estado, 'PENDIENTE');
   assert.equal(orders[0].total, '750.00');
   assert.equal(orders[0].comprobanteRecibido, false);
   assert.deepEqual(orders[0].detalles.map(item => [item.nombre, item.cantidad, item.subtotal]), [['Sérum', 2, '640.00']]);
+  assert.equal(orders[0].detalles[0].imagen, 'https://example.invalid/serum.jpg');
 });
 
 test('proof upload validates format and size and sends multipart file to the owned order route', async () => {

@@ -1,4 +1,4 @@
-import { record, list, identifier, text, nullableText } from '@/shared/adapters/validation';
+import { record, list, identifier, text, nullableText, decimal } from '@/shared/adapters/validation';
 import { AdapterError } from '@/shared/adapters/adapter-error';
 import { instant, hour } from '@/shared/adapters/account-validation';
 import type { Cita, Disponibilidad } from '../models/cita';
@@ -6,7 +6,7 @@ import { calendarDayFromApi } from '@/shared/viewmodels/calendar';
 export function citasResponse(value: unknown): readonly Cita[] {
   return list(value, 'citas').map((item) => {
     const dto = record(item, 'cita'); const servicio = record(dto.servicio, 'cita.servicio');
-    return { id: identifier(dto.id, 'cita.id'), servicioNombre: text(servicio.nombre, 'cita.servicio.nombre'),
+    return { id: identifier(dto.id, 'cita.id'), servicioId: dto.servicio_id == null ? null : identifier(dto.servicio_id, 'cita.servicio_id'), servicioNombre: text(servicio.nombre, 'cita.servicio.nombre'), total: dto.total == null ? null : decimal(dto.total, 'cita.total'),
       fecha: instant(dto.fecha, 'cita.fecha'), hora: hour(dto.hora), duracion: text(servicio.duracion, 'cita.servicio.duracion'),
       estado: text(dto.estado, 'cita.estado'), empleado: dto.empleado == null ? null : text(record(dto.empleado, 'cita.empleado').nombre, 'cita.empleado.nombre'),
       notas: dto.notas == null ? null : nullableText(dto.notas, 'cita.notas'), comprobanteRecibido: !!nullableText(dto.comprobante, 'cita.comprobante') };

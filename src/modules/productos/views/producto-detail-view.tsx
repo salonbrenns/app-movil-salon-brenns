@@ -12,6 +12,7 @@ import { useCarritoProductoViewModel } from '../viewmodels/use-carrito-producto-
 import { useFavoriteAction } from '@/modules/favoritos/viewmodels/use-favorite-action';
 import { FavoriteButton } from '@/components/ui/favorite-button';
 import { Spacing } from '@/theme';
+import { imageUri } from '@/shared/viewmodels/media-state';
 
 export default function ProductoDetailView() {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -23,7 +24,7 @@ export default function ProductoDetailView() {
     {!cargando && error ? <ErrorState message={error} onRetry={recargar} /> : null}
     {!cargando && !error && !producto ? <EmptyState title="Producto no disponible" description="Vuelve al catálogo para explorar los productos." /> : null}
     {producto ? <>
-      <MediaPlaceholder label={producto.nombre} source={selected?.imagen ?? producto.imagen} detail />
+      <MediaPlaceholder label={producto.nombre} source={imageUri(selected?.imagen) ? selected?.imagen : producto.imagen} detail />
       <View style={styles.heading}>
         <ThemedText type="title" accessibilityRole="header" style={styles.title}>{producto.nombre}</ThemedText>
         <FavoriteButton title={producto.nombre} selected={favorite.selected} disabled={favorite.authenticated && (favorite.cargando || !!favorite.error)} busy={favorite.ocupado} onPress={favorite.toggle} />

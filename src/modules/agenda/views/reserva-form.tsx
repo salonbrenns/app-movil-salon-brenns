@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -13,7 +13,6 @@ import { useReservaViewModel } from '../viewmodels/use-reserva-view-model';
 import type { Servicio } from '@/modules/servicios/models/servicio';
 import { formatPrice } from '@/utils/format-price';
 import { StatusMessage } from '@/components/feedback/status-message';
-import { PaymentProofUploader } from '@/components/ui/payment-proof-uploader';
 import { TextLink } from '@/components/ui/text-link';
 export function ReservaForm({ servicio }: { servicio: Servicio }) {
   const vm = useReservaViewModel(servicio);
@@ -27,7 +26,7 @@ export function ReservaForm({ servicio }: { servicio: Servicio }) {
     {vm.fecha ? <InfoRow label="Día" value={vm.fecha} /> : null}
     <ResourceStatus {...vm} empty={vm.consultado && !vm.horarios.length && !vm.cita} emptyTitle={vm.sinAtencion ? 'No hay atención para esta fecha' : 'No hay horarios disponibles para esta fecha'} />
     {vm.cita && !vm.mensaje ? <StatusMessage message={vm.comprobanteEnviado ? 'Comprobante recibido. Consulta el estado de la cita en Agenda.' : 'Cita #' + vm.cita.id + ' registrada. El pago por transferencia está pendiente.'} tone="info" /> : null}
-    {vm.cita && !vm.comprobanteEnviado ? <PaymentProofUploader onUpload={vm.enviarComprobante} /> : null}
+    {vm.cita && !vm.comprobanteEnviado ? <Link href={{ pathname: '/pago', params: { tipo: 'cita', id: vm.cita.id } }} asChild><Button label="Continuar al pago" /></Link> : null}
     {vm.conflicto ? <StatusMessage message={vm.conflicto} tone="info" /> : null}
     {!vm.cita && vm.fecha ? <ThemedText type="label">2. Elige un horario disponible</ThemedText> : null}
     {!vm.cita ? <HorariosSelector horarios={vm.horarios} selected={vm.hora} onSelect={vm.cambiarHora} disabled={vm.ocupado || vm.cargando} /> : null}
@@ -38,10 +37,10 @@ export function ReservaForm({ servicio }: { servicio: Servicio }) {
       {vm.hora ? <ThemedView surface="card" style={styles.section}><ThemedText type="subtitle">3. Confirma tu cita</ThemedText><InfoRow label="Servicio" value={servicio.nombre} /><InfoRow label="Día" value={vm.fecha} /><InfoRow label="Hora" value={vm.hora} /><InfoRow label="Precio del servicio" value={formatPrice(servicio.precio)} /><InfoRow label={vm.tipoPago === 'ANTICIPO' ? 'Anticipo a transferir' : 'Importe completo'} value={formatPrice(vm.importe)} accent /><InfoRow label="Método" value="Transferencia bancaria" /></ThemedView> : null}
       <DatosTransferencia datos={vm.transferencia.datos.banco} />
     </> : null}
-    <ThemedText type="small" themeColor="textSecondary">La cita se registra como pendiente. El pago debe acreditarse antes de su confirmación.</ThemedText>
+    <ThemedText type="small" themeColor="textSecondary">Después de registrar la cita, podrás adjuntar el comprobante de transferencia.</ThemedText>
     <ThemedText type="small" themeColor="textSecondary">Las cancelaciones de citas deben solicitarse con al menos 24 horas de anticipación. Fuera del plazo o por inasistencia, el anticipo puede no ser reembolsable, sin perjuicio de tus derechos legales.</ThemedText>
     <TextLink href="/cuenta/politicas" label="Consultar política de cancelaciones" />
-    <Button label={vm.cita ? 'Cita registrada' : 'Confirmar cita'} loading={vm.ocupado} disabled={!vm.puedeReservar} onPress={() => { void vm.reservar(); }} />
+    <Button label={vm.cita ? 'Cita registrada' : 'Confirmar cita'} loading={vm.ocupado} disabled={!vm.puedeReservar} onPress={() => { void vm.reservar((id) => router.push({ pathname: '/pago', params: { tipo: 'cita', id } })); }} />
     <TextLink href="/agenda" label="Ver mi agenda" />
   </View>;
 }
