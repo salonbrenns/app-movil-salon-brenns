@@ -1,5 +1,5 @@
 import { forwardRef, type ReactNode } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, type PressableProps, type View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, type PressableInstance, type PressableProps } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ControlStates, Radius, Shadows, Sizes, Spacing, Surfaces, Typography } from '@/constants/theme';
@@ -12,7 +12,7 @@ export type ButtonProps = PressableProps & {
   icon?: ReactNode;
 };
 
-export const Button = forwardRef<View, ButtonProps>(function Button(
+export const Button = forwardRef<PressableInstance, ButtonProps>(function Button(
   { label, variant = 'primary', loading = false, icon, disabled: disabledProp, style, accessibilityState, ...props },
   ref,
 ) {

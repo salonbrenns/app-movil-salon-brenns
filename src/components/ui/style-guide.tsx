@@ -5,6 +5,7 @@ import { useMediaViewModel } from '@/shared/viewmodels/use-media-view-model';
 
 import { ThemedText } from '@/components/themed-text';
 import { Icon } from '@/components/ui/icon';
+import { FavoriteButton } from '@/components/ui/favorite-button';
 import { Touchable } from '@/components/ui/touchable';
 import { Colors, IconSizes, Radius, Shadows, Sizes, Spacing, Typography } from '@/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -80,14 +81,15 @@ type CatalogCardProps = {
   href?: Href;
   compact?: boolean;
   image?: JsonValue;
+  favorite?: { selected: boolean; disabled?: boolean; busy?: boolean; onPress: () => void };
 };
 
-export function CatalogCard({ title, description, price, kind, href, compact = false, image }: CatalogCardProps) {
+export function CatalogCard({ title, description, price, kind, href, compact = false, image, favorite }: CatalogCardProps) {
   const theme = useTheme();
   const content = (
     <>
       <MediaPlaceholder label={title} compact source={image} fillWidth={compact} product={kind === 'product'} />
-      <View style={styles.cardCopy}>
+      <View style={[styles.cardCopy, favorite && !compact && styles.cardCopyWithFavorite]}>
         <ThemedText type={compact ? 'label' : 'action'} numberOfLines={2}>{title}</ThemedText>
         {!compact && description ? <ThemedText type="small" themeColor="textSecondary" numberOfLines={2}>{description}</ThemedText> : null}
         <View style={styles.row}>
@@ -97,11 +99,12 @@ export function CatalogCard({ title, description, price, kind, href, compact = f
       </View>
     </>
   );
-  const cardStyle = [styles.catalogCard, { backgroundColor: theme.backgroundElement, borderColor: theme.border }, compact ? styles.stackedCard : styles.row];
-  if (href) {
-    return <Link href={href} push asChild><Touchable accessibilityRole="button" accessibilityLabel={`Ver ${title}`} style={StyleSheet.flatten(cardStyle)}>{content}</Touchable></Link>;
-  }
-  return <View style={cardStyle} accessibilityLabel={`${kind === 'service' ? 'Servicio' : kind === 'course' ? 'Curso' : 'Producto'}: ${title}`}>{content}</View>;
+  const cardStyle = [styles.catalogCard, { backgroundColor: theme.backgroundElement, borderColor: theme.border }, compact && styles.stackedCard];
+  return <View style={cardStyle}>
+    {href ? <Link href={href} push asChild><Touchable accessibilityRole="button" accessibilityLabel={`Ver ${title}`} style={StyleSheet.flatten([styles.cardMain, compact ? styles.cardMainStacked : styles.row])}>{content}</Touchable></Link>
+      : <View style={[styles.cardMain, compact ? styles.cardMainStacked : styles.row]} accessibilityLabel={`${kind === 'service' ? 'Servicio' : kind === 'course' ? 'Curso' : 'Producto'}: ${title}`}>{content}</View>}
+    {favorite ? <FavoriteButton title={title} selected={favorite.selected} disabled={favorite.disabled} busy={favorite.busy} onPress={favorite.onPress} style={styles.cardFavorite} /> : null}
+  </View>;
 }
 
 export function SectionHeading({ title, href, action = 'Ver todos' }: { title: string; href?: Href; action?: string }) {
@@ -158,7 +161,11 @@ const styles = StyleSheet.create({
   detailMedia: { width: '100%', aspectRatio: 1.15, maxHeight: 370, minHeight: 220 },
   cardMedia: { width: '100%', height: Sizes.mediaCardHeight },
   catalogCard: { backgroundColor: Colors.backgroundElement, borderWidth: Sizes.borderWidth, borderColor: Colors.border, borderRadius: Radius.card, padding: Spacing.two, gap: Spacing.three, ...(Shadows?.card ?? {}) },
-  stackedCard: { flexDirection: 'column', flex: 1, gap: Spacing.two },
+  stackedCard: { flex: 1 },
+  cardMain: { flex: 1, gap: Spacing.three },
+  cardMainStacked: { flexDirection: 'column', gap: Spacing.two },
+  cardCopyWithFavorite: { paddingRight: Sizes.touchMinWidth },
+  cardFavorite: { position: 'absolute', top: Spacing.two, right: Spacing.two },
   cardCopy: { flex: 1, gap: Spacing.one },
   textAction: { minHeight: Sizes.controlMinHeight, minWidth: Sizes.touchMinWidth, alignItems: 'center', justifyContent: 'center' },
   menuRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderWidth: Sizes.borderWidth, borderColor: Colors.border, minHeight: Sizes.controlMinHeight, paddingHorizontal: Spacing.three, paddingVertical: Spacing.two, ...(Shadows?.control ?? {}) },

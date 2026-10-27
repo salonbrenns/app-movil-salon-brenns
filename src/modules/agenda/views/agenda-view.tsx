@@ -11,6 +11,7 @@ import { ResourceStatus } from '@/components/feedback/resource-status';
 import { Sizes, Spacing } from '@/theme';
 import { useAgendaViewModel } from '../viewmodels/use-agenda-view-model';
 import { PaymentProofUploader } from '@/components/ui/payment-proof-uploader';
+import { TextLink } from '@/components/ui/text-link';
 export default function ScheduleScreen() {
   const vm = useAgendaViewModel();
   const [cancelId, setCancelId] = useState<string | null>(null);
@@ -34,10 +35,12 @@ export default function ScheduleScreen() {
         {cita.notas ? <ThemedText type="small">{cita.notas}</ThemedText> : null}
         {cita.comprobanteRecibido ? <ThemedText type="small" themeColor="primary">Comprobante recibido</ThemedText> : cita.estado === 'PENDIENTE' ? <PaymentProofUploader onUpload={(asset) => vm.enviarComprobante(cita.id, asset)} /> : null}
         {['PENDIENTE', 'CONFIRMADA'].includes(cita.estado) ? <>
-          <Button label="Cancelar cita" variant="secondary" disabled={vm.ocupado || Date.parse(cita.fecha) - vm.now < 86400000} onPress={() => { setCancelId(cita.id); }} />
+          <ThemedText type="small" themeColor="textSecondary">Solicita la cancelación con al menos 24 horas de anticipación. El servidor confirmará si procede.</ThemedText>
+          <TextLink href="/cuenta/politicas" label="Consultar política de cancelaciones" />
+          <Button label="Solicitar cancelación" variant="secondary" disabled={vm.ocupado} onPress={() => { setCancelId(cita.id); }} />
           {cancelId === cita.id ? <ThemedView surface="card" style={styles.section}>
             <ThemedText type="label">¿Confirmas que deseas cancelar esta cita?</ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">El servidor comprobará si el estado permite cancelarla.</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">La política solicita al menos 24 horas de anticipación. El servidor determinará si procede. Esta acción no procesa reembolsos.</ThemedText>
             <Button label="Sí, cancelar cita" disabled={vm.ocupado} onPress={() => { setCancelId(null); void vm.cancelar(cita.id); }} />
             <Button label="Conservar cita" variant="secondary" onPress={() => { setCancelId(null); }} />
           </ThemedView> : null}
@@ -48,4 +51,4 @@ export default function ScheduleScreen() {
     <Link href="/catalogo?categoria=Servicios" push asChild><Button label="Agendar un servicio" /></Link>
   </Screen>;
 }
-const styles = StyleSheet.create({ list: { gap: Spacing.five }, section: { gap: Spacing.two }, appointment: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two }, detail: { flex: 1, gap: Spacing.two, minWidth: 0 }, detailAction: { minHeight: Sizes.touchMinWidth, justifyContent: 'center', paddingHorizontal: Spacing.one } });
+const styles = StyleSheet.create({ list: { gap: Spacing.four }, section: { gap: Spacing.three }, appointment: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two }, detail: { flex: 1, gap: Spacing.two, minWidth: 0 }, detailAction: { minHeight: Sizes.touchMinWidth, justifyContent: 'center', paddingHorizontal: Spacing.one } });

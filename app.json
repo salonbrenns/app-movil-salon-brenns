@@ -4,19 +4,19 @@
     "slug": "appmovil_Brenns",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/brenns-mark.png",
+    "icon": "./assets/images/brenns-app-icon.png",
     "scheme": "appmovilbrenns",
     "userInterfaceStyle": "light",
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#FFFFFF",
-        "foregroundImage": "./assets/images/brenns-mark.png"
+        "foregroundImage": "./assets/images/brenns-adaptive-icon.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/brenns-mark.png"
+      "favicon": "./assets/images/brenns-app-icon.png"
     },
     "plugins": [
       "expo-router",

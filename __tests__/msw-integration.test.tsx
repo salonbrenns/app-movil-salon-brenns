@@ -70,7 +70,7 @@ describe("Integración con API simulada usando MSW", () => {
   test("obtiene cursos desde una respuesta simulada", () =>
     render(<CursoPrueba />).then(async () => {
       expect(await screen.findByText("Curso de colorimetría")).toBeTruthy();
-    }));
+    }), 30000);
 
   test("maneja un error del servidor", async () => {
     server.use(

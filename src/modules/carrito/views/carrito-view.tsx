@@ -9,11 +9,13 @@ import { Button } from "@/components/ui/button";
 import { DatosTransferencia } from "@/components/ui/datos-transferencia";
 import { PaymentProofUploader } from "@/components/ui/payment-proof-uploader";
 import { Screen } from "@/components/ui/screen";
+import { TextLink } from '@/components/ui/text-link';
 import { InfoRow, MediaPlaceholder } from "@/components/ui/style-guide";
 
 import { Sizes, Spacing } from "@/theme";
 import { formatPrice } from "@/utils/format-price";
 import { useCarritoViewModel } from "../viewmodels/use-carrito-view-model";
+import { StorePickupInfo } from '@/modules/legal/components/store-pickup-info';
 
 export default function CarritoView() {
   const vm = useCarritoViewModel();
@@ -128,10 +130,7 @@ export default function CarritoView() {
               value={formatPrice(vm.resumen.subtotal)}
             />
 
-            <ThemedText type="small" themeColor="textSecondary">
-              El total del pedido y cualquier costo de entrega se confirman en
-              el servidor al registrarlo.
-            </ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">El total definitivo del pedido se confirma en el servidor al registrarlo.</ThemedText>
           </ThemedView>
 
           <Button
@@ -160,11 +159,8 @@ export default function CarritoView() {
                 <Button label="Editar datos" variant="secondary" />
               </Link>
 
-              <ThemedText type="small" themeColor="textSecondary">
-                Todavía no es posible elegir recogida en tienda ni registrar una
-                dirección de entrega en la app. El total definitivo se mostrará
-                al registrar el pedido.
-              </ThemedText>
+              <StorePickupInfo />
+              <TextLink href="/cuenta/compras-recogida" label="Consultar política de recogida" />
 
               {/* Pago exclusivamente por transferencia */}
               <InfoRow label="Método de pago" value="Transferencia bancaria" />
@@ -186,6 +182,11 @@ export default function CarritoView() {
             </ThemedText>
           ) : null}
 
+          <View style={styles.legalLinks}>
+            <TextLink href="/cuenta/terminos" label="Términos y condiciones" />
+            <TextLink href="/cuenta/politicas" label="Políticas de cancelaciones y devoluciones" />
+          </View>
+
           {/* Evitar confirmar nuevamente un pedido registrado */}
           <Button
             label="Confirmar pedido"
@@ -205,9 +206,7 @@ export default function CarritoView() {
       ) : null}
 
       {/* Historial de compras */}
-      <Link href="/cuenta/compras" asChild>
-        <Button label="Ver mis compras" variant="secondary" />
-      </Link>
+      <TextLink href="/cuenta/compras" label="Ver mis compras" />
     </Screen>
   );
 }
@@ -238,7 +237,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
-    gap: Spacing.one,
+    gap: Spacing.two,
   },
 
   quantityButton: {
@@ -263,6 +262,6 @@ const styles = StyleSheet.create({
 
   summary: {
     gap: Spacing.three,
-    marginTop: Spacing.three,
   },
+  legalLinks: { gap: Spacing.one },
 });

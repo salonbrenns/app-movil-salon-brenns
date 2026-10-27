@@ -33,7 +33,6 @@ export default function ProfileScreen() {
         <MenuRow label="Mis cursos" href="/cuenta/cursos" icon="course" compact />
         <MenuRow label="Mis citas" href="/agenda" icon="agenda" compact />
         <MenuRow label="Favoritos" href="/cuenta/favoritos" icon="heart" compact />
-        <MenuRow label="Direcciones" href="/cuenta/direcciones" icon="profile" compact />
         <MenuRow label="Configuración" href="/cuenta/configuracion" icon="settings" compact />
         <MenuRow label="Ayuda" href="/cuenta/ayuda" compact />
         <MenuRow label="Información legal" href="/cuenta/legal" compact />
@@ -43,6 +42,10 @@ export default function ProfileScreen() {
     </> : <>
       <ThemedText themeColor="textSecondary">Inicia sesión para consultar tu perfil y tus actividades.</ThemedText>
       <Link href="/autenticacion" asChild><Button label="Iniciar sesión" /></Link>
+      <View style={styles.menu}>
+        <MenuRow label="Ayuda" href="/cuenta/ayuda" compact />
+        <MenuRow label="Información legal" href="/cuenta/legal" compact />
+      </View>
     </>}
   </Screen>;
 }

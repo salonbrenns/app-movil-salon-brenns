@@ -9,6 +9,7 @@ import { useComprasViewModel } from '../viewmodels/use-compras-view-model';
 import { formatPrice } from '@/utils/format-price';
 import { PaymentProofUploader } from '@/components/ui/payment-proof-uploader';
 import { useScreenBackAction } from '@/components/ui/screen';
+import { StorePickupInfo } from '@/modules/legal/components/store-pickup-info';
 
 export function ComprasView() {
   const vm = useComprasViewModel();
@@ -23,6 +24,7 @@ export function ComprasView() {
       <InfoRow label="Total" value={formatPrice(pedido.total)} accent />
       <Button label={vm.detalle === pedido.id ? 'Ocultar detalle' : 'Ver detalle'} variant="secondary" onPress={() => vm.setDetalle(vm.detalle === pedido.id ? null : pedido.id)} />
       {vm.detalle === pedido.id ? <View style={styles.section}>
+        <StorePickupInfo />
         {pedido.detalles.map(item => <View key={item.id}><ThemedText type="smallBold">{item.nombre} × {item.cantidad}</ThemedText>{item.variante ? <ThemedText type="small" themeColor="textSecondary">{item.variante}</ThemedText> : null}<ThemedText type="small">{formatPrice(item.subtotal)}</ThemedText></View>)}
         <ThemedText type="small" themeColor="textSecondary">{pedido.comprobanteRecibido ? 'Comprobante recibido; el estado del pago depende de la revisión del servidor.' : 'Comprobante pendiente de envío.'}</ThemedText>
         {!pedido.comprobanteRecibido && !['ENTREGADO', 'CANCELADO'].includes(pedido.estado) ? <PaymentProofUploader onUpload={(asset) => vm.enviarComprobante(pedido.id, asset)} /> : null}

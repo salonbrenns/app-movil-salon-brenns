@@ -6,11 +6,11 @@ import { Screen } from '@/components/ui/screen';
 import { MediaPlaceholder } from '@/components/ui/style-guide';
 import { ReservaForm } from '@/modules/agenda/views/reserva-form';
 import { useFavoriteAction } from '@/modules/favoritos/viewmodels/use-favorite-action';
+import { FavoriteButton } from '@/components/ui/favorite-button';
 import { ResourceStatus } from '@/components/feedback/resource-status';
 import { EmptyState, ErrorState, LoadingState } from '@/components/feedback/async-states';
 import { Spacing } from '@/theme';
 import { useServiciosViewModel } from '@/modules/servicios/viewmodels/use-servicios-view-model';
-import { Button } from '@/components/ui/button';
 import { CatalogContent } from '@/modules/catalogo/views/catalogo-view';
 
 export default function ServicesScreen() {
@@ -27,9 +27,13 @@ export default function ServicesScreen() {
     <Screen title="Detalle" backHref="/catalogo">
       <MediaPlaceholder label={servicio.nombre} source={servicio.imagen} detail />
       <View style={styles.heading}>
-        <ThemedText type="title" accessibilityRole="header">{servicio.nombre}</ThemedText>
+        <View style={styles.headingRow}>
+          <ThemedText type="title" accessibilityRole="header" style={styles.title}>{servicio.nombre}</ThemedText>
+          <FavoriteButton title={servicio.nombre} selected={favorite.selected} disabled={favorite.authenticated && (favorite.cargando || !!favorite.error)} busy={favorite.ocupado} onPress={favorite.toggle} />
+        </View>
         <ThemedText type="subtitle" themeColor="primary" style={styles.price}>{precio}</ThemedText>
       </View>
+      <ResourceStatus {...favorite} cargando={false} />
       {servicio.descripcion ? <View style={styles.section}>
         <ThemedText type="subtitle" accessibilityRole="header">Descripción</ThemedText>
         <ThemedText themeColor="textSecondary">{servicio.descripcion}</ThemedText>
@@ -40,10 +44,8 @@ export default function ServicesScreen() {
         <ThemedText type="small" themeColor="textSecondary">{incluye}</ThemedText>
       </View> : null}
       <View style={styles.action}><ReservaForm servicio={servicio} /></View>
-      <ResourceStatus {...favorite} />
-      <Button label={favorite.label} variant="secondary" loading={favorite.ocupado} disabled={favorite.ocupado} onPress={favorite.toggle} />
     </Screen>
   );
 }
 
-const styles = StyleSheet.create({ heading: { gap: Spacing.one }, price: { alignSelf: 'flex-end' }, section: { gap: Spacing.two }, action: { paddingTop: Spacing.four } });
+const styles = StyleSheet.create({ heading: { gap: Spacing.one }, headingRow: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.two }, title: { flex: 1, minWidth: 0 }, price: { alignSelf: 'flex-end' }, section: { gap: Spacing.two }, action: { paddingTop: Spacing.three } });
