@@ -1,4 +1,5 @@
 import type { DocumentPickerAsset } from 'expo-document-picker';
+import { randomUUID } from 'expo-crypto';
 import { Directory, File, Paths } from 'expo-file-system';
 import { fetch as expoFetch } from 'expo/fetch';
 import { FetchHttpClient, type HttpMutationClient } from '@/services/api';
@@ -38,7 +39,7 @@ async function nativeProof(asset: DocumentPickerAsset): Promise<NativeProof> {
   catch { throw new Error('No se pudo abrir el archivo seleccionado en el dispositivo. Vuelve a seleccionarlo.'); }
   // The source may be a content:// URI. File.exists can report false when its
   // permission probe fails, so the awaited copy is the actual readability check.
-  const directory = new Directory(Paths.cache, `comprobante-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  const directory = new Directory(Paths.cache, `comprobante-${randomUUID()}`);
   try {
     directory.create();
     const file = new File(directory, asset.name);

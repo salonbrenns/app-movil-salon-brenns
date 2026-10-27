@@ -63,13 +63,14 @@ test('Inscribirme confirma el curso y navega con el pagoId real', () => {
   });
 });
 
-test('un curso terminado informa el motivo y no registra otra inscripción', async () => {
+test('un curso terminado informa el motivo y no registra otra inscripción', () => {
   const inscribir = jest.fn();
   (useInscripcionViewModel as jest.Mock).mockReturnValue({ authenticated: true, cargando: false, error: null, mensaje: null, ocupado: false, recargar: jest.fn(), transferencia: transfer, inscripcion: null, inscrito: false, pagoId: null, proofReceived: false, permitido: true, sinCupo: false, finalizado: true, puedeInscribir: false, inscribir });
-  await render(<InscripcionForm curso={{ id: '11', nombre: 'Ortonixias', precio: '2500.00', fechaFin: '2026-08-02' }} />);
-  expect(screen.getByText(/Este curso ya terminó/)).toBeTruthy();
-  expect(screen.getByRole('button', { name: 'Inscribirme' }).props.accessibilityState.disabled).toBe(true);
-  expect(inscribir).not.toHaveBeenCalled();
+  return render(<InscripcionForm curso={{ id: '11', nombre: 'Ortonixias', precio: '2500.00', fechaFin: '2026-08-02' }} />).then(() => {
+    expect(screen.getByText(/Este curso ya terminó/)).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Inscribirme' }).props.accessibilityState.disabled).toBe(true);
+    expect(inscribir).not.toHaveBeenCalled();
+  });
 });
 
 test('Confirmar cita navega al pago sin crear una segunda reservación', () => {
@@ -98,7 +99,7 @@ test.each([
   ['cita', 'Volver a Mis citas', '/agenda'],
   ['curso', 'Volver a Mis cursos', '/cuenta/cursos'],
   ['pedido', 'Volver a Mis compras', '/cuenta/compras'],
-])('la pantalla de pago de %s vuelve al registro correcto', async (kind, label, destination) => {
+])('la pantalla de pago de %s vuelve al registro correcto', (kind, label, destination) => {
   (useLocalSearchParams as jest.Mock).mockReturnValue({ tipo: kind, id: '31' });
   (usePaymentViewModel as jest.Mock).mockReturnValue({
     payment: { datos: { title: 'Operación', amount: '1200.00', status: 'PENDIENTE', proofReceived: true, canUpload: false }, cargando: false, error: null },
@@ -107,12 +108,13 @@ test.each([
     canUpload: false,
   });
   const user = userEvent.setup();
-  await render(<PaymentView />);
-  await user.press(screen.getByRole('button', { name: label }));
-  expect(navigate).toHaveBeenCalledWith(destination);
+  return render(<PaymentView />).then(async () => {
+    await user.press(screen.getByRole('button', { name: label }));
+    expect(navigate).toHaveBeenCalledWith(destination);
+  });
 });
 
-test('un pedido ya creado permite adjuntar comprobante sin inventar datos bancarios', async () => {
+test('un pedido ya creado permite adjuntar comprobante sin inventar datos bancarios', () => {
   (useLocalSearchParams as jest.Mock).mockReturnValue({ tipo: 'pedido', id: '2913' });
   (usePaymentViewModel as jest.Mock).mockReturnValue({
     payment: { datos: { title: 'Pedido #2913', amount: '260.00', status: 'PENDIENTE', proofReceived: false, canUpload: true }, cargando: false, error: null },
@@ -120,8 +122,9 @@ test('un pedido ya creado permite adjuntar comprobante sin inventar datos bancar
     proofReceived: false,
     canUpload: true,
   });
-  await render(<PaymentView />);
-  expect(screen.getAllByText(/datos bancarios aún no están configurados/)).toHaveLength(1);
-  expect(screen.getByText('Selector de comprobante disponible')).toBeTruthy();
-  expect(screen.getByText(/Si ya realizaste la transferencia/)).toBeTruthy();
+  return render(<PaymentView />).then(() => {
+    expect(screen.getAllByText(/datos bancarios aún no están configurados/)).toHaveLength(1);
+    expect(screen.getByText('Selector de comprobante disponible')).toBeTruthy();
+    expect(screen.getByText(/Si ya realizaste la transferencia/)).toBeTruthy();
+  });
 });

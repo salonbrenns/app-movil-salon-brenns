@@ -6,6 +6,7 @@ const { HttpAuthService } = require('@/modules/auth/services/auth-service');
 const { pedidosResponse } = require('@/modules/ventas/adapters/pedidos-adapter');
 const originalLoad = Module._load;
 Module._load = function(request, ...args) {
+  if (request === 'expo-crypto') return { randomUUID: require('node:crypto').randomUUID };
   if (request === 'expo-file-system') return { File: class {}, Directory: class {}, Paths: {} };
   if (request === 'expo/fetch') return { fetch: global.fetch };
   return originalLoad.call(this, request, ...args);

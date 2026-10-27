@@ -12,11 +12,17 @@ import { StatusMessage } from '@/components/feedback/status-message';
 import { accountSectionStyles as styles } from '@/components/ui/account-section-styles';
 import { useAuthSession } from '@/modules/auth/viewmodels/auth-session-provider';
 import { formatPrice } from '@/utils/format-price';
-import { paymentKind } from '../models/pago';
+import { paymentKind, type PaymentKind } from '../models/pago';
 import { usePaymentViewModel } from '../viewmodels/use-payment-view-model';
 
-const returnPaths = { cita: '/agenda', curso: '/cuenta/cursos', pedido: '/cuenta/compras' } as const;
-const returnLabels = { cita: 'Volver a Mis citas', curso: 'Volver a Mis cursos', pedido: 'Volver a Mis compras' } as const;
+function returnDestination(kind: PaymentKind | null) {
+  switch (kind) {
+    case 'cita': return { href: '/agenda', label: 'Volver a Mis citas' } as const;
+    case 'curso': return { href: '/cuenta/cursos', label: 'Volver a Mis cursos' } as const;
+    case 'pedido': return { href: '/cuenta/compras', label: 'Volver a Mis compras' } as const;
+    default: return { href: '/', label: 'Volver al inicio' } as const;
+  }
+}
 
 export default function PaymentView() {
   const params = useLocalSearchParams<{ tipo?: string; id?: string }>();
@@ -24,10 +30,10 @@ export default function PaymentView() {
   const id = typeof params.id === 'string' ? params.id : '';
   const { status } = useAuthSession();
   const vm = usePaymentViewModel(kind, id);
-  const backHref = kind ? returnPaths[kind] : '/';
+  const destination = returnDestination(kind);
   if (status === 'anonymous') return <Redirect href={{ pathname: '/autenticacion', params: { returnTo: `/pago?tipo=${kind ?? ''}&id=${encodeURIComponent(id)}` } }} />;
   const operation = vm.payment.datos;
-  return <Screen title="Pago por transferencia" backHref={backHref}>
+  return <Screen title="Pago por transferencia" backHref={destination.href}>
     <ResourceStatus {...vm.payment} />
     {operation ? <ThemedView surface="card" style={styles.section}>
       <ThemedText type="subtitle">Resumen</ThemedText>
@@ -48,6 +54,6 @@ export default function PaymentView() {
       {!vm.proofReceived && vm.canUpload ? <PaymentProofUploader onUpload={vm.upload} /> : null}
       {!vm.proofReceived && !operation.canUpload ? <StatusMessage message="Esta operación no permite subir otro comprobante. Consulta su estado en tu cuenta." tone="info" /> : null}
     </View> : null}
-    {kind ? <Link href={returnPaths[kind]} asChild><Button label={returnLabels[kind]} variant="secondary" /></Link> : null}
+    {kind ? <Link href={destination.href} asChild><Button label={destination.label} variant="secondary" /></Link> : null}
   </Screen>;
 }
