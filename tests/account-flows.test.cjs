@@ -36,7 +36,7 @@ test('errors distinguish session, permission, input conflict and server failure 
   for (const [status, kind] of [[401, 'sesion'], [403, 'permiso'], [409, 'validacion'], [500, 'servidor']]) {
     const error = new HttpError(status, { error: 'Motivo específico' }, '/api/mis-cursos');
     assert.equal(operationError(error).kind, kind);
-    assert.ok(operationError(error).message.includes('/api/mis-cursos; HTTP ' + status));
+    assert.ok(!operationError(error).message.includes('HTTP ' + status));
     const vm = new SessionResource(async () => [], true);
     await vm.cargar();
     assert.equal(await vm.ejecutar(async () => { throw error; }, 'Success'), false);

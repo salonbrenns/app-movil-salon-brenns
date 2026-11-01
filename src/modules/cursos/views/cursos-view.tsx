@@ -1,11 +1,9 @@
 import { StyleSheet, View } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { Link, useLocalSearchParams, type Href } from 'expo-router';
 
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { Screen } from '@/components/ui/screen';
 import { InfoRow, MediaPlaceholder } from '@/components/ui/style-guide';
-import { InscripcionForm } from './inscripcion-form';
 import { EmptyState, ErrorState, LoadingState } from '@/components/feedback/async-states';
 import { Spacing } from '@/theme';
 import { useCursosViewModel } from '@/modules/cursos/viewmodels/use-cursos-view-model';
@@ -13,6 +11,7 @@ import { CatalogContent } from '@/modules/catalogo/views/catalogo-view';
 import { useFavoriteAction } from '@/modules/favoritos/viewmodels/use-favorite-action';
 import { FavoriteButton } from '@/components/ui/favorite-button';
 import { ResourceStatus } from '@/components/feedback/resource-status';
+import { Button } from '@/components/ui/button';
 import type { Curso } from '@/modules/cursos/models/curso';
 
 export default function CoursesScreen() {
@@ -43,8 +42,8 @@ function CourseDetail({ curso, informacion, precio }: { curso: Curso; informacio
       <View style={styles.details}>
         {informacion.map((item) => <InfoRow key={item.label} {...item} />)}
       </View>
-      <ThemedView surface="card"><InfoRow label="Precio" value={precio} accent /></ThemedView>
-      <InscripcionForm curso={curso} />
+      <InfoRow label="Precio" value={precio} accent />
+      <Link href={{ pathname: '/pago-curso', params: { id: curso.id } } as unknown as Href} asChild><Button label="Proceder al pago" /></Link>
     </Screen>
   );
 }

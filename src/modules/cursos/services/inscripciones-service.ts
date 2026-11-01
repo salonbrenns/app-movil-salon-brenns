@@ -19,6 +19,7 @@ export class HttpInscripcionesService {
     const resume = pendiente(existing, id);
     if (resume) return resume;
     if (inscrito || existing.some((item) => item.cursoId === id && item.estado === 'ACTIVO')) throw new Error('Ya estás inscrito en este curso. Consulta su estado en Mis cursos.');
+    if (existing.some((item) => item.cursoId === id)) throw new Error('Ya existe una inscripción anterior para este curso. Consulta su estado en Mis cursos.');
     try {
       return inscripcionResponse((await this.http.request('/api/cursos/' + apiId(id) + '/inscribir', { method: 'POST' })).body);
     } catch (error) {

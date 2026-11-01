@@ -5,7 +5,7 @@ import { HttpFavoritosService } from '../services/favoritos-service';
 import { useSessionResource } from '@/shared/viewmodels/use-session-resource';
 const service = new HttpFavoritosService();
 export function useFavoriteCollection(categoria: CategoriaCatalogo) {
-  const vm = useSessionResource(useCallback((signal?: AbortSignal) => service.listar(categoria, { signal }), [categoria]));
+  const vm = useSessionResource(useCallback((signal?: AbortSignal) => service.listar(categoria, { signal }), [categoria]), 'favoritos');
   return { ...vm,
     isFavorite: (id?: string) => !!id && !!vm.datos?.some((item) => item.id === id),
     toggle: (id: string) => {
@@ -13,7 +13,7 @@ export function useFavoriteCollection(categoria: CategoriaCatalogo) {
         router.push({ pathname: '/autenticacion', params: { returnTo: categoria === 'Productos' ? '/productos/' + id : (categoria === 'Cursos' ? '/cursos?id=' : '/servicios?id=') + id } });
         return;
       }
-      void vm.ejecutar(() => service.toggle(categoria, id), (accion) => accion === 'agregado' ? 'Favorito agregado.' : 'Favorito eliminado.');
+      void vm.ejecutar(() => service.toggle(categoria, id), (accion) => accion === 'agregado' ? 'Favorito agregado.' : 'Favorito eliminado.', undefined, 'cambiar-favorito');
     },
   };
 }

@@ -18,6 +18,5 @@ export const BottomNavigationItems = [
  { href: '/perfil', label: 'Perfil', icon: 'profile' },
 ] as const satisfies readonly { href: Href; label: string; icon: string }[];
 export function showsBottomNavigation(pathname: string) {
- if (['/autenticacion', '/verificar-email', '/cuenta/crear-cuenta', '/cuenta/verificar-email'].includes(pathname)) return false;
- return pathname === '/' || Object.values(NavigationSections).some(section => section.href === pathname) || pathname.startsWith('/cuenta/');
+ return pathname !== '/autenticacion' && pathname !== '/cuenta/crear-cuenta';
 }

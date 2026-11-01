@@ -3,6 +3,7 @@ const { test } = require('node:test');
 const { AdapterError, ModelNotFoundError } = require('@/shared/adapters/adapter-error');
 const { HttpError } = require('@/services/api');
 const { LoadState } = require('@/shared/viewmodels/load-state');
+const { userError } = require('@/shared/adapters/user-error');
 
 function deferred() {
   let resolve;
@@ -36,7 +37,7 @@ test('presentation state keeps HTTP and transformation failures distinguishable'
   ]) {
     const state = new LoadState(previous);
     await state.load(async () => { throw failure; });
-    assert.deepEqual(state.getSnapshot(), { datos: previous, estadoCarga: 'error', error: failure.message });
+    assert.deepEqual(state.getSnapshot(), { datos: previous, estadoCarga: 'error', error: userError(failure).message });
     assert.equal(state.getErrorType(), type);
     await state.load(async () => []);
     assert.deepEqual(state.getSnapshot(), { datos: [], estadoCarga: 'listo', error: null });

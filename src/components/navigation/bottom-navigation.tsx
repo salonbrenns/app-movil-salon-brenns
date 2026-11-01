@@ -13,8 +13,8 @@ export function BottomNavigation() {
   const pathname = usePathname();
   const theme = useTheme();
   if (!showsBottomNavigation(pathname)) return null;
-  const activeHref = ['/catalogo', '/cursos', '/servicios'].includes(pathname) ? '/catalogo'
-    : pathname === '/agenda' ? '/agenda' : pathname === '/carrito' ? '/carrito' : pathname === '/perfil' || pathname.startsWith('/cuenta/') ? '/perfil' : '/';
+  const activeHref = ['/catalogo', '/cursos', '/servicios', '/pago-servicio', '/pago-curso'].includes(pathname) || pathname.startsWith('/productos/') ? '/catalogo'
+    : pathname === '/agenda' ? '/agenda' : ['/carrito', '/finalizar-compra'].includes(pathname) ? '/carrito' : pathname === '/perfil' || pathname.startsWith('/cuenta/') ? '/perfil' : '/';
 
   return (
     <SafeAreaView edges={['left', 'right', 'bottom']} style={[styles.surface, { backgroundColor: theme.backgroundElement, borderTopColor: theme.border }]}>

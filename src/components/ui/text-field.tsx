@@ -3,6 +3,7 @@ import { StyleSheet, TextInput, View, type TextInputInstance, type TextInputProp
 
 import { ThemedText } from '@/components/themed-text';
 import { Touchable } from '@/components/ui/touchable';
+import { Icon } from '@/components/ui/icon';
 import { ControlStates, Radius, Sizes, Spacing, Typography } from '@/theme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -36,7 +37,7 @@ export const TextField = forwardRef<TextInputInstance, TextFieldProps>(function 
         />
         {onTogglePassword ? (
           <Touchable disabled={!editable} onPress={onTogglePassword} accessibilityRole="button" accessibilityLabel={`${secureTextEntry ? 'Mostrar' : 'Ocultar'} ${label.toLowerCase()}`} style={styles.toggle}>
-            <ThemedText type="label" themeColor="primary">{secureTextEntry ? 'Mostrar' : 'Ocultar'}</ThemedText>
+            <Icon name={secureTextEntry ? 'eye' : 'eye-off'} color={theme.primary} size={20} />
           </Touchable>
         ) : null}
       </View>
@@ -49,5 +50,5 @@ const styles = StyleSheet.create({
   field: { gap: Spacing.two },
   control: { flexDirection: 'row', alignItems: 'center', borderWidth: Sizes.borderWidth, borderRadius: Radius.control },
   input: { ...Typography.body, flex: 1, minWidth: 0, minHeight: Sizes.controlMinHeight, paddingHorizontal: Spacing.three, paddingVertical: Spacing.two },
-  toggle: { paddingHorizontal: Spacing.two, justifyContent: 'center', alignItems: 'center' },
+  toggle: { width: Sizes.controlMinHeight, height: Sizes.controlMinHeight, justifyContent: 'center', alignItems: 'center' },
 });

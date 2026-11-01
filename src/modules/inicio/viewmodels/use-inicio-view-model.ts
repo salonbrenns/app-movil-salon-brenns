@@ -1,10 +1,11 @@
 import { useAuthSession } from '@/modules/auth/viewmodels/auth-session-provider';
-import { useCatalogoViewModel } from '@/modules/catalogo/viewmodels/use-catalogo-view-model';
 import { useAgendaViewModel } from '@/modules/agenda/viewmodels/use-agenda-view-model';
+import { proximaCita } from './proxima-cita';
+import { saludoDeSesion } from './saludo';
+
 export function useInicioViewModel() {
  const { session, status } = useAuthSession();
- const catalogo = useCatalogoViewModel();
  const agenda = useAgendaViewModel();
- return { saludo: session?.user.name ? 'Hola, ' + session.user.name : 'Hola', autenticado: status === 'authenticated',
-  catalogo, proximaCita: status === 'authenticated' ? agenda.citas[0] : undefined };
+ return { saludo: saludoDeSesion(status === 'authenticated' ? session?.user.name : null),
+  status, agenda, proximaCita: status === 'authenticated' ? proximaCita(agenda.datos ?? [], agenda.now) : undefined };
 }

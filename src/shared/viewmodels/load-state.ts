@@ -1,5 +1,6 @@
 import { AdapterError, ModelNotFoundError } from '../adapters/adapter-error';
 import { HttpError } from '@/services/api';
+import { userError } from '@/shared/adapters/user-error';
 import type { EstadoModulo } from '../models/view-state';
 
 export type TipoErrorDatos = 'http' | 'adaptacion' | 'no-encontrado' | 'otro';
@@ -45,7 +46,7 @@ export class LoadState<T> {
       if (current === this.request) this.publish({ datos, estadoCarga: 'listo', error: null });
     } catch (error) {
       if (current === this.request) {
-        this.publish({ ...this.snapshot, estadoCarga: 'error', error: error instanceof Error ? error.message : 'No fue posible cargar los datos.' }, tipoErrorDatos(error));
+        this.publish({ ...this.snapshot, estadoCarga: 'error', error: userError(error).message }, tipoErrorDatos(error));
       }
     }
   }

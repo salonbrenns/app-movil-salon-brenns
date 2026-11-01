@@ -20,6 +20,8 @@ const drawings = {
   bell: <Path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 9h18c0-1-3-2-3-9M10 21h4" />,
   heart: <Path d="M20.8 8.5c0 4.2-8.8 10-8.8 10S3.2 12.7 3.2 8.5a4.4 4.4 0 0 1 8.8 0 4.4 4.4 0 0 1 8.8 0z" />,
   settings: <><Circle cx="12" cy="12" r="3" /><Path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l-1.8 1.8a1.7 1.7 0 0 0-1.9-.3 8 8 0 0 1-2 .8L13.5 21h-3l-.5-1.8a8 8 0 0 1-2-.8 1.7 1.7 0 0 0-1.9.3l-1.8-1.8a1.7 1.7 0 0 0 .3-1.9 8 8 0 0 1-.8-2L2 12.5v-3l1.8-.5a8 8 0 0 1 .8-2 1.7 1.7 0 0 0-.3-1.9l1.8-1.8a1.7 1.7 0 0 0 1.9.3 8 8 0 0 1 2-.8L10.5 1h3l.5 1.8a8 8 0 0 1 2 .8 1.7 1.7 0 0 0 1.9-.3l1.8 1.8a1.7 1.7 0 0 0-.3 1.9 8 8 0 0 1 .8 2l1.8.5v3l-1.8.5a8 8 0 0 1-.8 2z" /></>,
+  eye: <><Path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z" /><Circle cx="12" cy="12" r="2.5" /></>,
+  'eye-off': <><Path d="M3 3l18 18M10 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a15 15 0 0 1-3.3 3.7M6.1 8.1A16 16 0 0 0 2 12s3.5 6 10 6c1.2 0 2.3-.2 3.3-.6" /><Path d="M10 10a2.7 2.7 0 0 0 3.9 3.9" /></>,
 } as const;
 
 export type IconName = keyof typeof drawings;
@@ -42,6 +44,8 @@ function drawingFor(name: IconName) {
     case 'bell': return drawings.bell;
     case 'heart': return drawings.heart;
     case 'settings': return drawings.settings;
+    case 'eye': return drawings.eye;
+    case 'eye-off': return drawings['eye-off'];
   }
 }
 

@@ -74,9 +74,11 @@ test('servicio y estado de sesión impiden dos confirmaciones simultáneas', asy
   assert.equal(requests, 1);
 });
 
-test('solo transferencia está disponible en la interfaz y el servicio rechaza otros métodos', async () => {
-  const view = fs.readFileSync(path.join(__dirname, '..', 'src/modules/carrito/views/carrito-view.tsx'), 'utf8');
-  assert.match(view, /Método de pago.*Transferencia bancaria/);
+test('solo transferencia está disponible en la finalización y el servicio rechaza otros métodos', async () => {
+  const view = fs.readFileSync(path.join(__dirname, '..', 'src/modules/carrito/views/finalizar-compra-view.tsx'), 'utf8');
+  const viewModel = fs.readFileSync(path.join(__dirname, '..', 'src/modules/carrito/viewmodels/use-carrito-view-model.ts'), 'utf8');
+  assert.match(view, /<DatosTransferencia datos=/);
+  assert.match(viewModel, /const metodoPago = 'transferencia'/);
   assert.doesNotMatch(view, /ChoiceChips|['"]tarjeta['"]|['"]efectivo['"]/);
   let requests = 0;
   const http = new FetchHttpClient(() => 'https://example.invalid', async () => { requests++; return new Response(JSON.stringify(respuesta)); });

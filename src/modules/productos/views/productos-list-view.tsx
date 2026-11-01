@@ -14,7 +14,7 @@ export function ProductosListView({ productos, resetKey, favorites }: { producto
   const { cardWidth } = getProductGridLayout(gridWidth, Spacing.two);
   return <>
     <View style={styles.grid} onLayout={(event) => { setGridWidth(event.nativeEvent.layout.width); }}>{tarjetas.map(({ id, ...card }) => <View key={id} style={[styles.cell, { width: cardWidth ?? '100%' }]}><CatalogCard {...card} compact favorite={{ selected: favorites.isFavorite(id), disabled: favorites.authenticated && (favorites.cargando || !!favorites.error), busy: favorites.ocupado, onPress: () => favorites.toggle(id) }} /></View>)}</View>
-    <PaginationControls {...pagination} />
+    <PaginationControls {...pagination} visible={productos.length > 0} />
   </>;
 }
 

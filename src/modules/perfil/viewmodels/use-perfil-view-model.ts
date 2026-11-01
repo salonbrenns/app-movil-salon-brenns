@@ -11,6 +11,6 @@ export function usePerfilViewModel() {
   const vm = useSessionResource(useCallback(
     (signal?: AbortSignal) => service.obtener(email, { signal }),
     [email],
-  ));
+  ), 'perfil');
   return { perfil: vm.datos, error: vm.error, cargando: vm.cargando, recargar: vm.recargar };
 }

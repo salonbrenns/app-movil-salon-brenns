@@ -73,6 +73,9 @@ function AppShell() {
           <Stack.Screen name="+not-found" options={{ title: 'Página no encontrada' }} />
           <Stack.Screen name="verificar-email" options={{ title: 'Verificar correo' }} />
           <Stack.Screen name="pago" options={{ title: 'Pago por transferencia' }} />
+          <Stack.Screen name="pago-servicio" options={{ title: 'Pago de servicio' }} />
+          <Stack.Screen name="pago-curso" options={{ title: 'Pago de curso' }} />
+          <Stack.Screen name="finalizar-compra" options={{ title: 'Finalizar compra' }} />
           <Stack.Screen name="cuenta/[seccion]" options={{ title: 'Mi cuenta' }} />
         </Stack>
         <BottomNavigation />

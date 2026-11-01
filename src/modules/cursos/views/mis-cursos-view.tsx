@@ -6,6 +6,7 @@ import { accountSectionStyles as styles } from '@/components/ui/account-section-
 import { ResourceStatus } from '@/components/feedback/resource-status';
 import { useMisCursosViewModel } from '../viewmodels/use-mis-cursos-view-model';
 import { formatPrice } from '@/utils/format-price';
+import { PaginationControls } from '@/components/ui/pagination-controls';
 export function MisCursosView() {
   const vm = useMisCursosViewModel();
   return <><ResourceStatus {...vm} empty={!vm.cursos.length} emptyTitle="No tienes inscripciones" />
@@ -23,6 +24,7 @@ export function MisCursosView() {
       </View>)}
       {item.cursoId ? <MenuRow label="Ver curso" href={{ pathname: '/cursos', params: { id: item.cursoId } }} /> : null}
     </ThemedView>)}
+    <PaginationControls {...vm.pagination} visible={vm.cursos.length > 0} />
     <MenuRow label="Explorar cursos" href="/catalogo?categoria=Cursos" />
   </>;
 }
