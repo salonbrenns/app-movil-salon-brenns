@@ -130,7 +130,9 @@ test.each(ARCO_RIGHTS)(
   "ARCO prepara %s con correo oficial y caracteres codificados",
   async (right) => {
     openURL.mockResolvedValue(true);
-    const { result } = await renderHook(useArcoRequestViewModel);
+    const { result } = await Promise.resolve(
+      renderHook(useArcoRequestViewModel),
+    );
     await act(() => {
       result.current.setName("  Ana   López  ");
       result.current.setEmail(" ana@example.com ");
@@ -210,10 +212,7 @@ test("ARCO conserva los datos y permite copiar correo y solicitud cuando falla l
   openURL.mockRejectedValue(new Error("Sin aplicación"));
   const user = userEvent.setup();
   await Promise.resolve(render(<ArcoRequestView />));
-  await user.paste(
-    screen.getByLabelText("Nombre completo"),
-    "Ana López",
-  );
+  await user.paste(screen.getByLabelText("Nombre completo"), "Ana López");
   await user.paste(
     screen.getByLabelText("Correo para recibir respuesta"),
     "ana@example.com",
@@ -324,10 +323,7 @@ test("eliminación funciona sin sesión y conserva campos cuando falla el correo
   );
   expect(screen.getByText(/Escribe el nombre del titular/)).toBeTruthy();
   expect(openURL).not.toHaveBeenCalled();
-  await user.paste(
-    screen.getByLabelText("Nombre del titular"),
-    "Luis",
-  );
+  await user.paste(screen.getByLabelText("Nombre del titular"), "Luis");
   await user.paste(
     screen.getByLabelText("Correo de la cuenta"),
     "luis@example.com",
