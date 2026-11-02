@@ -4,6 +4,7 @@ import { useSessionResource } from '@/shared/viewmodels/use-session-resource';
 import { useTransferenciaViewModel } from '@/shared/viewmodels/use-transferencia-view-model';
 import { HttpComprobanteService } from '@/shared/services/comprobante-service';
 import { operationError } from '@/shared/viewmodels/session-resource';
+import { UserFacingError } from '@/shared/adapters/user-error';
 import { HttpError } from '@/services/api';
 import type { PaymentKind } from '../models/pago';
 import { PaymentOperationService } from '../services/payment-operation-service';
@@ -37,7 +38,7 @@ export function usePaymentViewModel(kind: PaymentKind | null, id: string) {
           if (current.proofReceived) { setUploaded(uploadKey); await payment.recargar(); return; }
         } catch { /* Report the original upload failure. */ }
       }
-      throw new Error(operationError(error).message);
+      throw new UserFacingError(operationError(error, 'subir-comprobante').message);
     } finally {
       inFlight.current = false;
     }

@@ -7,6 +7,7 @@ import { Button } from './button';
 import { StatusMessage } from '@/components/feedback/status-message';
 import { accountSectionStyles as styles } from './account-section-styles';
 import { comprobanteType, prepararComprobante } from '@/shared/services/comprobante-service';
+import { userError } from '@/shared/adapters/user-error';
 
 export function PaymentProofUploader({ onUpload, disabled = false }: { onUpload: (asset: DocumentPicker.DocumentPickerAsset) => Promise<void>; disabled?: boolean }) {
   const [asset, setAsset] = useState<DocumentPicker.DocumentPickerAsset | null>(null);
@@ -43,7 +44,7 @@ export function PaymentProofUploader({ onUpload, disabled = false }: { onUpload:
       setAsset(prepared.asset);
       setError(null);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : 'No se pudo seleccionar el archivo.');
+      setError(userError(reason, 'seleccionar-comprobante').message);
     } finally {
       inFlight.current = false;
       if (!mounted.current) clearProof();
@@ -56,7 +57,7 @@ export function PaymentProofUploader({ onUpload, disabled = false }: { onUpload:
     inFlight.current = true;
     setBusy(true); setError(null);
     try { await onUpload(asset); clearProof(); setAsset(null); setSent(true); }
-    catch (reason) { setError(reason instanceof Error ? reason.message : 'No se pudo subir el comprobante.'); }
+    catch (reason) { setError(userError(reason, 'subir-comprobante').message); }
     finally { inFlight.current = false; if (!mounted.current) clearProof(); setBusy(false); }
   }
 

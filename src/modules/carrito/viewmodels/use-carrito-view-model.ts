@@ -22,7 +22,7 @@ export function useCarritoViewModel() {
     useCallback(
       (signal?: AbortSignal) => service.obtener({ signal }),
       []
-    )
+    ), 'carrito'
   );
 
   const { sessionRevision } = useAuthSession();
@@ -80,19 +80,19 @@ export function useCarritoViewModel() {
     eliminar: (id: string) =>
       vm.ejecutar(
         () => service.eliminar(id),
-        'Producto eliminado del carrito.'
+        'Producto eliminado del carrito.', undefined, 'eliminar-carrito'
       ),
 
     cambiarCantidad: (id: string, cantidad: number) =>
       vm.ejecutar(
         () => service.cantidad(id, cantidad),
-        'Cantidad actualizada.'
+        'Cantidad actualizada.', undefined, 'cantidad-carrito'
       ),
 
     vaciar: () =>
       vm.ejecutar(
         () => service.eliminar(),
-        'Carrito vaciado.'
+        'Carrito vaciado.', undefined, 'carrito'
       ),
 
     confirmarPedido: (onCreated?: (id: string) => void) => {
@@ -125,7 +125,7 @@ export function useCarritoViewModel() {
           lastOrderRef.current = confirmed;
           setLastOrder(confirmed);
           onCreated?.(order.id);
-        }
+        }, 'pedido'
       );
     },
 

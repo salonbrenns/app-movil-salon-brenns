@@ -25,6 +25,8 @@ import { Colors, Radius, Shadows, Sizes, Spacing } from '@/theme';
 import { useCatalogoViewModel } from '@/modules/catalogo/viewmodels/use-catalogo-view-model';
 import { useFavoriteCollection } from '@/modules/favoritos/viewmodels/use-favorite-action';
 import { ResourceStatus } from '@/components/feedback/resource-status';
+import { PaginationControls } from '@/components/ui/pagination-controls';
+import { usePaginationViewModel } from '@/shared/viewmodels/use-pagination-view-model';
 
 export default function CatalogScreen() {
   const { categoria, q } = useLocalSearchParams<{
@@ -82,6 +84,7 @@ export function CatalogContent({
   } = useCatalogoViewModel(categoriaInicial, busquedaInicial);
   const favorites = useFavoriteCollection(categoriaSeleccionada);
   const count = categoriaSeleccionada === 'Productos' ? productosFiltrados.length : tarjetas.length;
+  const pagination = usePaginationViewModel(tarjetas, JSON.stringify([categoriaSeleccionada, busqueda, filtroServicio, filtroCurso]), 10);
 
   return (
     <Screen title={title} backHref={backHref}>
@@ -138,11 +141,12 @@ export function CatalogContent({
                 ordenProducto,
               ])}
             />
-          ) : (
-            tarjetas.map(({ id, ...card }) => (
+          ) : <>
+            {pagination.items.map(({ id, ...card }) => (
               <CatalogCard key={id} {...card} favorite={{ selected: favorites.isFavorite(id), disabled: favorites.authenticated && (favorites.cargando || !!favorites.error), busy: favorites.ocupado, onPress: () => favorites.toggle(id) }} />
-            ))
-          )
+            ))}
+            <PaginationControls {...pagination} visible={count > 0} />
+          </>
         ) : null}
       </View>
       <FilterSheet visible={filtrosAbiertos} onClose={() => { setFiltrosAbiertos(false); }}>

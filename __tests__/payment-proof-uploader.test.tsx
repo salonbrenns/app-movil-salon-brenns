@@ -8,6 +8,11 @@ import { PaymentProofUploader } from '@/components/ui/payment-proof-uploader';
 jest.mock('expo-document-picker', () => ({
   getDocumentAsync: jest.fn(),
 }));
+jest.mock('expo-image', () => {
+  const React = jest.requireActual<typeof import('react')>('react');
+  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
+  return { Image: ({ accessibilityLabel }: { accessibilityLabel: string }) => React.createElement(View, { accessibilityLabel }) };
+});
 jest.mock('@/shared/services/comprobante-service', () => ({
   comprobanteType: jest.requireActual<typeof import('@/shared/services/comprobante-service')>('@/shared/services/comprobante-service').comprobanteType,
   prepararComprobante: jest.fn(async (asset) => ({ asset, cleanup: jest.fn() })),
@@ -63,12 +68,12 @@ test('muestra errores de selección y envío, y permite reintentar', async () =>
   const upload = jest.fn().mockRejectedValueOnce(new Error('Error del servidor')).mockResolvedValueOnce(undefined);
   return render(<PaymentProofUploader onUpload={upload} />).then(async () => {
     await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Seleccionar archivo' })); });
-    await waitFor(() => { expect(screen.getByText(/Selecciona un archivo JPG/)).toBeTruthy(); });
+    await waitFor(() => { expect(screen.getByText('Este formato de archivo no es compatible.')).toBeTruthy(); });
     expect(screen.getByRole('button', { name: 'Enviar comprobante' }).props.accessibilityState.disabled).toBe(true);
     await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Seleccionar archivo' })); });
     await waitFor(() => { expect(screen.getByText('pago.pdf')).toBeTruthy(); });
     await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Enviar comprobante' })); });
-    await waitFor(() => { expect(screen.getByText('Error del servidor')).toBeTruthy(); });
+    await waitFor(() => { expect(screen.getByText('No pudimos subir tu comprobante. Inténtalo nuevamente.')).toBeTruthy(); });
     expect(cleanup).not.toHaveBeenCalled();
     await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Enviar comprobante' })); });
     await waitFor(() => { expect(screen.getByText('Comprobante enviado correctamente.')).toBeTruthy(); });
@@ -76,5 +81,28 @@ test('muestra errores de selección y envío, y permite reintentar', async () =>
     expect(upload).toHaveBeenNthCalledWith(1, staged);
     expect(upload).toHaveBeenNthCalledWith(2, staged);
     expect(cleanup).toHaveBeenCalledTimes(1);
+  });
+});
+
+test('previsualiza una imagen, permite reemplazarla y quitarla antes del envío', async () => {
+  const first = { ...proof, name: 'primero.jpg', mimeType: 'image/jpeg', uri: 'file:///primero.jpg' };
+  const second = { ...first, name: 'segundo.jpg', uri: 'file:///segundo.jpg' };
+  const firstCleanup = jest.fn();
+  const secondCleanup = jest.fn();
+  picker.mockResolvedValueOnce({ canceled: false, assets: [first] }).mockResolvedValueOnce({ canceled: false, assets: [second] });
+  prepare.mockResolvedValueOnce({ asset: first, cleanup: firstCleanup }).mockResolvedValueOnce({ asset: second, cleanup: secondCleanup });
+  const upload = jest.fn();
+  return render(<PaymentProofUploader onUpload={upload} />).then(async () => {
+    await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Seleccionar archivo' })); });
+    expect(screen.getByText('primero.jpg')).toBeTruthy();
+    expect(screen.getByLabelText('Vista previa del comprobante')).toBeTruthy();
+    await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Reemplazar archivo' })); });
+    expect(firstCleanup).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('segundo.jpg')).toBeTruthy();
+    await act(async () => { fireEvent.press(screen.getByRole('button', { name: 'Quitar archivo' })); });
+    expect(secondCleanup).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText('segundo.jpg')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Enviar comprobante' }).props.accessibilityState.disabled).toBe(true);
+    expect(upload).not.toHaveBeenCalled();
   });
 });

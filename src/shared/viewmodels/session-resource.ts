@@ -1,26 +1,7 @@
-import { HttpError } from '@/services/api';
-import { AdapterError } from '@/shared/adapters/adapter-error';
-import { InputError } from '@/shared/adapters/input-error';
-import { SessionDataError } from '@/shared/adapters/session-data-error';
+import { userError, type ErrorContext, type UserErrorKind } from '@/shared/adapters/user-error';
 
-export type OperationErrorKind = 'sesion' | 'permiso' | 'validacion' | 'servidor' | 'respuesta' | 'conexion';
-export function operationError(error: unknown): { kind: OperationErrorKind; message: string } {
-  if (error instanceof AdapterError) {
-    if (process.env.NODE_ENV === 'development') console.warn('[adaptador] Respuesta inválida', { campo: error.path, esperado: error.expected });
-    return { kind: 'respuesta', message: error.path.startsWith('config-sitio.')
-      ? 'Los datos bancarios aún no están configurados correctamente. Intenta más tarde.'
-      : 'No se pudo cargar la información. Intenta de nuevo.' };
-  }
-  if (error instanceof InputError) return { kind: 'validacion', message: error.message };
-  if (error instanceof SessionDataError) return { kind: 'sesion', message: error.message };
-  if (error instanceof HttpError) {
-    const kind = error.status === 401 ? 'sesion' : error.status === 403 ? 'permiso' : error.status >= 500 ? 'servidor' : 'validacion';
-    const body = typeof error.body === 'object' && error.body !== null ? error.body as Record<string, unknown> : {};
-    const fallback = kind === 'sesion' ? 'Tu sesión expiró. Inicia sesión de nuevo.' : kind === 'permiso' ? 'Tu cuenta no tiene permiso para esta acción.' : kind === 'servidor' ? 'El servidor no pudo completar la solicitud.' : 'Revisa los datos e intenta de nuevo.';
-    return { kind, message: `${typeof body.error === 'string' ? body.error : fallback} [${error.path.split('?')[0]}; HTTP ${error.status}]` };
-  }
-  return { kind: 'conexion', message: error instanceof TypeError ? 'No fue posible conectar. Revisa tu conexión e intenta de nuevo.' : error instanceof Error ? error.message : 'No fue posible completar la solicitud.' };
-}
+export type OperationErrorKind = UserErrorKind;
+export function operationError(error: unknown, context?: ErrorContext): { kind: OperationErrorKind; message: string } { return userError(error, context); }
 export type SessionResourceState<T> = Readonly<{ datos: T | null; estadoCarga: 'cargando' | 'listo' | 'error'; error: string | null; tipoError: OperationErrorKind | null; ocupado: boolean; mensaje: string | null }>;
 
 /** One resource per confirmed session revision; no user data is persisted globally. */
@@ -31,7 +12,7 @@ export class SessionResource<T> {
   private active = true;
   private lifetime = 0;
   private controller: AbortController | null = null;
-  constructor(private readonly loader: (signal?: AbortSignal) => Promise<T>, private readonly authenticated: boolean, readonly sessionScope = '') {
+  constructor(private readonly loader: (signal?: AbortSignal) => Promise<T>, private readonly authenticated: boolean, readonly sessionScope = '', private readonly loadContext?: ErrorContext) {
     this.state = { datos: null, estadoCarga: authenticated ? 'cargando' : 'listo', error: null, tipoError: null, ocupado: false, mensaje: null };
   }
   getSnapshot = () => this.state;
@@ -50,12 +31,12 @@ export class SessionResource<T> {
       if (this.active && current === this.generation) this.publish({ datos, estadoCarga: 'listo' });
     } catch (error) {
       if (this.active && current === this.generation) {
-        const failure = operationError(error);
+        const failure = operationError(error, this.loadContext);
         this.publish({ estadoCarga: 'error', error: failure.message, tipoError: failure.kind, ...(failure.kind === 'sesion' ? { datos: null } : {}) });
       }
     }
   };
-  ejecutar = async <R>(operation: () => Promise<R>, message: string | ((result: R) => string), onConfirmed?: (result: R) => void): Promise<boolean> => {
+  ejecutar = async <R>(operation: () => Promise<R>, message: string | ((result: R) => string), onConfirmed?: (result: R) => void, context?: ErrorContext): Promise<boolean> => {
     if (!this.authenticated || !this.active || this.state.ocupado) return false;
     const lifetime = this.lifetime;
     this.publish({ ocupado: true, error: null, tipoError: null, mensaje: null });
@@ -67,7 +48,7 @@ export class SessionResource<T> {
       await this.cargar();
       return this.active && lifetime === this.lifetime;
     } catch (error) {
-      if (this.active && lifetime === this.lifetime) { const failure = operationError(error); this.publish({ error: failure.message, tipoError: failure.kind }); }
+      if (this.active && lifetime === this.lifetime) { const failure = operationError(error, context); this.publish({ error: failure.message, tipoError: failure.kind }); }
       return false;
     } finally { if (this.active && lifetime === this.lifetime) this.publish({ ocupado: false }); }
   };

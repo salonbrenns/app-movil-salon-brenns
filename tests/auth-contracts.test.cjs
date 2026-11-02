@@ -65,6 +65,7 @@ test('submission gate prevents simultaneous requests and releases after errors',
 });
 test('login returns only to existing internal protected routes, preserving the query', () => {
   assert.equal(loginDestination('/cursos?id=4'), '/cursos?id=4');
+  assert.equal(loginDestination('/finalizar-compra'), '/finalizar-compra');
   assert.equal(loginDestination('/'), '/');
   for (const path of ['https://evil.invalid', '//evil.invalid', '/autenticacion', '/agenda/../autenticacion', '/agenda/%2e%2e', '/agenda\\evil', '/agenda/desconocida', ['/agenda']]) assert.equal(loginDestination(path), '/');
 });
@@ -96,7 +97,7 @@ test('registration RASP rejection is reported without disabling resend or alteri
     assert.equal(error.operation, 'Registro');
     assert.equal(error.status, 403);
     assert.equal(error.path, '/api/auth/register');
-    assert.ok(authErrorMessage(error).includes('HTTP 403'));
+    assert.equal(authErrorMessage(error), 'No pudimos crear tu cuenta. Inténtalo nuevamente.');
     return error.message.includes('RASP');
   });
   assert.equal(requests[0].body.password, fields.password);

@@ -13,10 +13,10 @@ export function useInscripcionViewModel(curso: Curso) {
   const finalizado = cursoFinalizado(curso, localCalendarDay(new Date(useCurrentTime())));
   const scope = sessionRevision + ':' + curso.id;
   const [receipt, setReceipt] = useState<{ scope: string; inscripcion: InscripcionCreada } | null>(null);
-  const vm = useSessionResource(useCallback((signal?: AbortSignal) => service.listar({ signal }), []));
+  const vm = useSessionResource(useCallback((signal?: AbortSignal) => service.listar({ signal }), []), 'mis-cursos');
   const transferencia = useTransferenciaViewModel();
   const inscripcion = receipt?.scope === scope ? receipt.inscripcion : null;
-  const existing = vm.datos?.find((item) => item.cursoId === curso.id && item.estado === 'ACTIVO');
+  const existing = vm.datos?.find((item) => item.cursoId === curso.id);
   const pendingPayment = existing?.pagos.find((item) => item.estado === 'PENDIENTE' && !item.comprobanteRecibido);
   const proofReceived = existing?.pagos.some((item) => item.comprobanteRecibido) ?? false;
   const pagoId = inscripcion?.pagoId ?? pendingPayment?.id ?? null;
@@ -27,5 +27,5 @@ export function useInscripcionViewModel(curso: Curso) {
   return { ...vm, transferencia, inscripcion, inscrito, pagoId, proofReceived, permitido, sinCupo, finalizado, puedeInscribir,
     inscribir: (onCreated?: (pagoId: string) => void) => puedeInscribir ? vm.ejecutar(() => service.inscribir(curso.id),
       (item) => 'Inscripción #' + item.inscripcionId + ' registrada.',
-      (item) => { setReceipt({ scope, inscripcion: item }); onCreated?.(item.pagoId); }) : Promise.resolve(false) };
+      (item) => { setReceipt({ scope, inscripcion: item }); onCreated?.(item.pagoId); }, 'inscripcion') : Promise.resolve(false) };
 }

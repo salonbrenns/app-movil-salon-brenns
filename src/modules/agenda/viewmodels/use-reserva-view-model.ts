@@ -12,14 +12,15 @@ import type { Disponibilidad, ReservaCreada } from '../models/cita';
 import { reservarConDisponibilidad } from './reserva-actions';
 import { HttpComprobanteService } from '@/shared/services/comprobante-service';
 import type { DocumentPickerAsset } from 'expo-document-picker';
+import { InputError } from '@/shared/adapters/input-error';
 const service = new HttpAgendaService();
 const comprobantes = new HttpComprobanteService();
 type Draft = { scope: string; fecha: string; hora: string | null; tipoPago: 'ANTICIPO' | 'COMPLETO' };
-export function useReservaViewModel(servicio: Servicio, empleadoId?: string) {
+export function useReservaViewModel(servicio: Servicio, empleadoId?: string, initial?: { fecha: string; hora: string }) {
   const { sessionRevision } = useAuthSession();
   const scope = sessionRevision + ':' + servicio.id + ':' + (empleadoId ?? '');
   const today = localCalendarDay(new Date(useCurrentTime()));
-  const [draft, setDraft] = useState<Draft | null>(null);
+  const [draft, setDraft] = useState<Draft | null>(() => initial ? { scope, fecha: initial.fecha, hora: initial.hora, tipoPago: 'COMPLETO' } : null);
   const [receipt, setReceipt] = useState<{ scope: string; cita: ReservaCreada; fecha: string; hora: string; tipoPago: 'ANTICIPO' | 'COMPLETO'; importe: string } | null>(null);
   const [conflict, setConflict] = useState<{ scope: string; message: string } | null>(null);
   const [proofSent, setProofSent] = useState<string | null>(null);
@@ -28,17 +29,18 @@ export function useReservaViewModel(servicio: Servicio, empleadoId?: string) {
   if (conflict && conflict.scope !== scope) setConflict(null);
   const current = draft?.scope === scope ? draft : null;
   const fecha = current?.fecha ?? '', hora = current?.hora ?? null, tipoPago = current?.tipoPago ?? 'COMPLETO';
-  const dias = useSessionResource(useCallback((signal?: AbortSignal) => service.diasBloqueados({ signal }), []));
+  const dias = useSessionResource(useCallback((signal?: AbortSignal) => service.diasBloqueados({ signal }), []), 'agenda');
   const transferencia = useTransferenciaViewModel();
   const calendar = useCalendarViewModel(today, dias.datos ?? []);
   const fechaValida = !!dias.datos && !dias.cargando && !dias.error && selectableDay(fecha, today, dias.datos);
   const load = useCallback((signal?: AbortSignal): Promise<Disponibilidad | null> => fechaValida ? service.horarios(servicio.id, fecha, { signal }, empleadoId) : Promise.resolve(null), [servicio.id, fecha, empleadoId, fechaValida]);
-  const vm = useSessionResource(load);
+  const vm = useSessionResource(load, 'horarios');
   const horarios = !vm.cargando && !vm.error && fechaValida && !vm.datos?.sinAtencion ? vm.datos?.horarios.filter((slot) => slot.disponible) ?? [] : [];
   const selected = horarios.some((slot) => slot.hora === hora);
   const cita = receipt?.scope === scope ? receipt.cita : null;
   const importe = receipt?.scope === scope ? receipt.importe : transferencia.datos ? importeReserva(servicio.precio, tipoPago, transferencia.datos.anticipoPorcentaje) : null;
   const puedeReservar = selected && !vm.ocupado && !vm.cargando && !cita && !!importe && !transferencia.cargando && !transferencia.error;
+  const puedeContinuar = selected && !vm.ocupado && !vm.cargando && !vm.error;
   const change = (value: Partial<Draft>) => { if (!vm.ocupado) setDraft({ scope, fecha, hora, tipoPago, ...value }); };
   return { ...vm, dias, transferencia, calendar, fecha, hora: receipt?.scope === scope ? receipt.hora : selected ? hora : null, tipoPago, importe, cita, comprobanteEnviado: proofSent === scope, horarios,
     conflicto: conflict?.scope === scope ? conflict.message : null,
@@ -46,11 +48,20 @@ export function useReservaViewModel(servicio: Servicio, empleadoId?: string) {
     cambiarFecha: (next: string) => { if (dias.datos && selectableDay(next, today, dias.datos)) { change({ fecha: next, hora: null }); setConflict(null); } },
     cambiarHora: (next: string) => { if (horarios.some((slot) => slot.hora === next)) { change({ hora: next }); setConflict(null); } },
     cambiarTipoPago: (next: string) => { if (next === 'ANTICIPO' || next === 'COMPLETO') change({ tipoPago: next }); },
-    puedeReservar,
+    puedeReservar, puedeContinuar,
     reservar: (onCreated?: (id: string) => void) => puedeReservar && hora && importe ? vm.ejecutar(
-      () => reservarConDisponibilidad(() => service.reservar(servicio.id, fecha, hora, importe, empleadoId), async () => { await Promise.all([vm.recargar(), dias.recargar()]); }, () => { setDraft((previous) => previous?.scope === scope && previous.fecha === fecha ? { ...previous, hora: null } : previous); setConflict({ scope, message: 'La disponibilidad cambió. Selecciona otra fecha u hora antes de confirmar.' }); }),
+      () => reservarConDisponibilidad(async () => {
+        const fresh = await service.horarios(servicio.id, fecha, undefined, empleadoId);
+        if (fresh.sinAtencion || !fresh.horarios.some(slot => slot.hora === hora && slot.disponible)) {
+          setDraft((previous) => previous?.scope === scope ? { ...previous, hora: null } : previous);
+          setConflict({ scope, message: 'La disponibilidad cambió. Selecciona otra fecha u hora antes de confirmar.' });
+          await vm.recargar();
+          throw new InputError('La disponibilidad cambió. Selecciona otra fecha u hora antes de confirmar.');
+        }
+        return service.reservar(servicio.id, fecha, hora, importe, empleadoId);
+      }, async () => { await Promise.all([vm.recargar(), dias.recargar()]); }, () => { setDraft((previous) => previous?.scope === scope && previous.fecha === fecha ? { ...previous, hora: null } : previous); setConflict({ scope, message: 'La disponibilidad cambió. Selecciona otra fecha u hora antes de confirmar.' }); }),
       (result) => 'Cita #' + result.id + ' registrada.',
-      (result) => { setReceipt({ scope, cita: result, fecha, hora, tipoPago, importe }); onCreated?.(result.id); }) : Promise.resolve(false),
+      (result) => { setReceipt({ scope, cita: result, fecha, hora, tipoPago, importe }); onCreated?.(result.id); }, 'reserva') : Promise.resolve(false),
     enviarComprobante: async (asset: DocumentPickerAsset) => { if (!cita) throw new Error('Primero registra la cita.'); await comprobantes.subir('citas', cita.id, asset); setProofSent(scope); },
   };
 }

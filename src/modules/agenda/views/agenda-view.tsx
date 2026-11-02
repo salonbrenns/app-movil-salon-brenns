@@ -11,6 +11,7 @@ import { ResourceStatus } from '@/components/feedback/resource-status';
 import { Sizes, Spacing } from '@/theme';
 import { useAgendaViewModel } from '../viewmodels/use-agenda-view-model';
 import { TextLink } from '@/components/ui/text-link';
+import { PaginationControls } from '@/components/ui/pagination-controls';
 export default function ScheduleScreen() {
   const vm = useAgendaViewModel();
   const [cancelId, setCancelId] = useState<string | null>(null);
@@ -46,6 +47,7 @@ export default function ScheduleScreen() {
         </> : null}</> : null}
       </ThemedView>
     </View>)}</View>
+    <PaginationControls {...vm.pagination} visible={vm.citas.length > 0} />
     <Button label="Actualizar agenda" variant="secondary" disabled={vm.cargando} onPress={() => { void vm.recargar(); }} />
     <Link href="/catalogo?categoria=Servicios" push asChild><Button label="Agendar un servicio" /></Link>
   </Screen>;

@@ -55,7 +55,7 @@
     "typecheck": "tsc --noEmit",
     "test:legacy": "node ./scripts/run-tests.cjs",
     "test": "jest",
-    "test:coverage": "jest --coverage",
+    "test:coverage": "jest --coverage --runInBand",
     "test:all": "npm run test:legacy && npm run test"
   },
   "private": true

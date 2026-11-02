@@ -24,8 +24,8 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#FFFFFF",
-          "image": "./assets/images/brenns-logo-oficial.png",
-          "imageWidth": 280,
+          "image": "./assets/images/brenns-splash-logo.png",
+          "imageWidth": 200,
           "resizeMode": "contain"
         }
       ],
