@@ -1,4 +1,5 @@
 import type { LegalDocument } from '../models/legal-document';
+import { business } from './business';
 
 export const policiesDocument: LegalDocument = {
   "title": "Políticas de cancelaciones, devoluciones y garantías",
@@ -26,7 +27,7 @@ export const policiesDocument: LegalDocument = {
         },
         {
           "kind": "paragraph",
-          "text": "Si recibiste un producto dañado, notifícalo de inmediato a salonbrennsdudas@gmail.com."
+          "text": `Si recibiste un producto dañado, notifícalo de inmediato a ${business.email}.`
         }
       ]
     },
@@ -58,7 +59,7 @@ export const policiesDocument: LegalDocument = {
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "Puedes solicitar una revisión si consideras que hubo un error al validar una transferencia o su comprobante. Las aclaraciones se atienden en salonbrennsdudas@gmail.com."
+          "text": `Puedes solicitar una revisión si consideras que hubo un error al validar una transferencia o su comprobante. Las aclaraciones se atienden en ${business.email}.`
         },
         {
           "kind": "paragraph",

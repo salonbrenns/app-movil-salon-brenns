@@ -3,6 +3,7 @@ import { faqs } from '@/modules/legal/data/faqs';
 import { act, renderHook } from '@testing-library/react-native';
 import { useFaqViewModel } from '@/modules/legal/viewmodels/use-faq-view-model';
 import { emailDraftUri } from '@/modules/legal/services/email-draft';
+import { business } from '@/modules/legal/data/business';
 import { isProtectedPath } from '@/modules/auth/models/auth-navigation';
 import { PAGINAS_CUENTA } from '@/modules/cuenta/viewmodels/cuenta-state';
 
@@ -32,6 +33,13 @@ test('incluye los seis borradores móviles y las condiciones críticas sin depen
   expect(flatten('compras')).toContain('recogen directamente');
   expect(flatten('arco')).toContain('ni confirma su recepción');
   expect(flatten('eliminacion')).toContain('no elimina automáticamente');
+  for (const key of ['privacidad', 'terminos', 'politicas', 'compras', 'arco', 'eliminacion'] as const) {
+    expect(flatten(key)).not.toContain('salonbrennsdudas@gmail.com');
+  }
+  expect(business.email).toBe('salonbrenns11@gmail.com');
+  expect(flatten('arco')).toContain(business.email);
+  expect(flatten('privacidad')).toContain(business.email);
+  expect(flatten('eliminacion')).toContain(business.email);
 });
 
 test('las rutas legales y la solicitud de eliminación son públicas, sin Direcciones', () => {
@@ -43,6 +51,7 @@ test('las rutas legales y la solicitud de eliminación son públicas, sin Direcc
   expect(PAGINAS_CUENTA.some((page) => page.seccion === 'direcciones')).toBe(false);
   expect(emailDraftUri('Solicitud ARCO: Acceso', 'Nombre: Ana López\nDetalle')).toContain('subject=Solicitud%20ARCO%3A%20Acceso');
   expect(emailDraftUri('Solicitud ARCO: Acceso', 'Nombre: Ana López\nDetalle')).toContain('body=Nombre%3A%20Ana%20L%C3%B3pez%0ADetalle');
+  expect(emailDraftUri('Solicitud ARCO: Acceso', 'Nombre: Ana López\nDetalle').startsWith(`mailto:${business.email}?`)).toBe(true);
 });
 
 test('ofrece exactamente las cinco preguntas y respuestas solicitadas', () => {

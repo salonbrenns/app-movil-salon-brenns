@@ -1,4 +1,5 @@
 import type { LegalDocument } from '../models/legal-document';
+import { business } from './business';
 
 export const arcoDocument: LegalDocument = {
   "title": "Derechos ARCO",
@@ -32,7 +33,7 @@ export const arcoDocument: LegalDocument = {
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "Prepara un correo dirigido a salonbrennsdudas@gmail.com con tu nombre, un correo para recibir respuesta, el derecho que deseas ejercer, una descripción de tu solicitud y los datos involucrados cuando corresponda."
+          "text": `Prepara un correo dirigido a ${business.email} con tu nombre, un correo para recibir respuesta, el derecho que deseas ejercer, una descripción de tu solicitud y los datos involucrados cuando corresponda.`
         },
         {
           "kind": "paragraph",
@@ -41,6 +42,14 @@ export const arcoDocument: LegalDocument = {
         {
           "kind": "paragraph",
           "text": "La identidad de la persona solicitante deberá verificarse por un procedimiento adecuado y seguro definido por el establecimiento."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Para Rectificación, indica qué información debe corregirse y el cambio solicitado. El responsable deberá comunicar un mecanismo seguro para recibir la documentación que sustente la petición; no incluyas identificaciones, contraseñas ni datos bancarios en el formulario."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Después de recibir el correo, el establecimiento deberá identificar el derecho, solicitar la acreditación de identidad o representación cuando corresponda, revisar los datos involucrados y comunicar una respuesta fundada. Preparar el mensaje no acredita su recepción."
         }
       ]
     },
@@ -51,6 +60,10 @@ export const arcoDocument: LegalDocument = {
         {
           "kind": "paragraph",
           "text": "La Ley Federal de Protección de Datos Personales en Posesión de los Particulares prevé comunicar la determinación en un máximo general de 20 días hábiles desde la recepción de la solicitud y, si procede, hacerla efectiva dentro de los 15 días hábiles siguientes a la comunicación. La ley permite ampliaciones justificadas."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Los plazos pueden ampliarse una sola vez por un periodo igual cuando las circunstancias lo justifiquen. Una negativa total o parcial deberá explicarse; una obligación legal puede impedir o diferir la cancelación de ciertos datos."
         }
       ]
     }
