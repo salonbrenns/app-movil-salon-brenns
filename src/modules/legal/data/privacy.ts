@@ -1,4 +1,5 @@
 import type { LegalDocument } from '../models/legal-document';
+import { business } from './business';
 
 export const privacyDocument: LegalDocument = {
   "title": "Aviso de privacidad",
@@ -18,7 +19,7 @@ export const privacyDocument: LegalDocument = {
         },
         {
           "kind": "paragraph",
-          "text": "Correo para asuntos de privacidad: salonbrennsdudas@gmail.com."
+          "text": `Correo para asuntos de privacidad: ${business.email}.`
         },
         {
           "kind": "paragraph",
@@ -136,7 +137,7 @@ export const privacyDocument: LegalDocument = {
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "Las personas usuarias pueden solicitar Acceso, Rectificación, Cancelación y Oposición respecto de sus datos personales mediante un correo a salonbrennsdudas@gmail.com o preparando el mensaje desde la pantalla Derechos ARCO."
+          "text": `Las personas usuarias pueden solicitar Acceso, Rectificación, Cancelación y Oposición respecto de sus datos personales mediante un correo a ${business.email} o preparando el mensaje desde la pantalla Derechos ARCO.`
         },
         {
           "kind": "paragraph",
@@ -144,7 +145,15 @@ export const privacyDocument: LegalDocument = {
         },
         {
           "kind": "paragraph",
-          "text": "De conformidad con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, la determinación se comunicará dentro de un plazo máximo general de 20 días hábiles desde la recepción de la solicitud y, si procede, se hará efectiva dentro de los 15 días hábiles siguientes a la comunicación de la respuesta. Pueden aplicarse las ampliaciones legalmente justificadas."
+          "text": "Incluye tu nombre, un correo para recibir respuesta, la descripción del derecho solicitado y los datos involucrados cuando corresponda. Para rectificar, indica el cambio y aporta el sustento por el mecanismo seguro que defina el responsable. El establecimiento deberá verificar identidad o representación antes de entregar información o ejecutar cambios."
+        },
+        {
+          "kind": "paragraph",
+          "text": "De conformidad con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, la determinación se comunicará dentro de un plazo máximo general de 20 días hábiles desde la recepción de la solicitud y, si procede, se hará efectiva dentro de los 15 días hábiles siguientes a la comunicación de la respuesta. Los plazos pueden ampliarse una sola vez por un periodo igual si las circunstancias lo justifican; una negativa total o parcial deberá explicarse."
+        },
+        {
+          "kind": "paragraph",
+          "text": "La solicitud de eliminación de cuenta puede presentarse por el mismo correo. No produce un borrado inmediato: el responsable deberá verificar la identidad, revisar obligaciones legales de conservación y comunicar el resultado. Para pedir información adicional sobre el procedimiento, escribe al correo de privacidad indicado arriba."
         }
       ]
     },

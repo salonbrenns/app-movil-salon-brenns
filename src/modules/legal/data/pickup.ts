@@ -1,4 +1,5 @@
 import type { LegalDocument } from '../models/legal-document';
+import { business } from './business';
 
 export const pickupDocument: LegalDocument = {
   "title": "Compras y recogida en tienda",
@@ -62,7 +63,7 @@ export const pickupDocument: LegalDocument = {
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "Para reportar diferencias en el pedido, productos incorrectos o problemas de pago, escribe a salonbrennsdudas@gmail.com."
+          "text": `Para reportar diferencias en el pedido, productos incorrectos o problemas de pago, escribe a ${business.email}.`
         }
       ]
     }

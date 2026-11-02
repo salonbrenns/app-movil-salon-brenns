@@ -1,4 +1,5 @@
 import type { LegalDocument } from '../models/legal-document';
+import { business } from './business';
 
 export const termsDocument: LegalDocument = {
   "title": "Términos y condiciones",
@@ -122,7 +123,7 @@ export const termsDocument: LegalDocument = {
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "Para dudas sobre compras, servicios, cursos o pagos, escribe a salonbrennsdudas@gmail.com."
+          "text": `Para dudas sobre compras, servicios, cursos o pagos, escribe a ${business.email}.`
         }
       ]
     }
