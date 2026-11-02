@@ -30,7 +30,9 @@ jest.mock('@/components/ui/style-guide', () => {
   const React = jest.requireActual<typeof import('react')>('react');
   const { Pressable, Text, View } = jest.requireActual<typeof import('react-native')>('react-native');
   return { ChoiceChips: ({ options, onSelect }: { options: readonly { value: string; label: string }[]; onSelect: (value: string) => void }) =>
-    React.createElement(View, null, options.map(({ value, label }) => React.createElement(Pressable, { key: value, accessibilityRole: 'radio', accessibilityLabel: label, onPress: () => onSelect(value) }, React.createElement(Text, null, label)))) };
+    React.createElement(View, null, options.map(({ value, label }) => React.createElement(Pressable, { key: value, accessibilityRole: 'radio', accessibilityLabel: label, onPress: () => {
+      onSelect(value);
+    } }, React.createElement(Text, null, label)))) };
 });
 
 const openURL = Linking.openURL as jest.Mock;
