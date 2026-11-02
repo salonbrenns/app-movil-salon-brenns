@@ -12,14 +12,22 @@ test.each([
   expect(result.current.totalPages).toBe(3);
   expect(result.current.items).toHaveLength(size);
   expect(result.current.canPrevious).toBe(false);
-  await act(() => result.current.previous());
+  await act(() => {
+    result.current.previous();
+  });
   expect(result.current.currentPage).toBe(1);
-  await act(() => result.current.next());
+  await act(() => {
+    result.current.next();
+  });
   expect(result.current.items).toEqual(records.slice(size, size * 2));
-  await act(() => result.current.next());
+  await act(() => {
+    result.current.next();
+  });
   expect(result.current.items).toHaveLength(1);
   expect(result.current.canNext).toBe(false);
-  await act(() => result.current.next());
+  await act(() => {
+    result.current.next();
+  });
   expect(result.current.currentPage).toBe(3);
 });
 
@@ -29,10 +37,14 @@ test('listas independientes conservan sus páginas y un cambio de filtro vuelve 
     actuales: usePaginationViewModel(records, filter, 5),
     historial: usePaginationViewModel(records, 'history', 5),
   }), { initialProps: { filter: 'all' } });
-  await act(() => result.current.actuales.next());
+  await act(() => {
+    result.current.actuales.next();
+  });
   expect(result.current.actuales.currentPage).toBe(2);
   expect(result.current.historial.currentPage).toBe(1);
-  await act(() => result.current.historial.next());
+  await act(() => {
+    result.current.historial.next();
+  });
   await rerender({ filter: 'filtered' });
   expect(result.current.actuales.currentPage).toBe(1);
   expect(result.current.historial.currentPage).toBe(2);

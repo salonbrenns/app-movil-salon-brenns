@@ -21,7 +21,9 @@ export function useAgendaViewModel() {
   const proximas = usePaginationViewModel((vm.datos ?? []).filter(proxima).sort((a, b) => appointmentTime(a) - appointmentTime(b)), `proximas:${sessionRevision}`, 4);
   const historial = usePaginationViewModel((vm.datos ?? []).filter(cita => !proxima(cita)).sort((a, b) => appointmentTime(b) - appointmentTime(a)), `historial:${sessionRevision}`, 4);
   const pagination = seccion === 'Próximas' ? proximas : historial;
-  return { ...vm, now, citas: pagination.items, pagination, detalleId, verDetalle: (id: string) => setDetalle(detalleId === id ? null : { revision: sessionRevision, id }), secciones: SECCIONES_AGENDA, seccionSeleccionada: seccion,
+  return { ...vm, now, citas: pagination.items, pagination, detalleId, verDetalle: (id: string) => {
+    setDetalle(detalleId === id ? null : { revision: sessionRevision, id });
+  }, secciones: SECCIONES_AGENDA, seccionSeleccionada: seccion,
     seleccionarSeccion: setSeccion, cancelar: (id: string) => vm.ejecutar(() => service.cancelar(id), 'Cita cancelada.', undefined, 'cancelar-cita'),
     enviarComprobante: async (id: string, asset: DocumentPickerAsset) => { await comprobantes.subir('citas', id, asset); await vm.recargar(); } };
 }

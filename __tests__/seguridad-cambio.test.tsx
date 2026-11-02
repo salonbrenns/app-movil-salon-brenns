@@ -11,8 +11,8 @@ jest.mock('@/modules/perfil/services/perfil-service', () => ({
   },
 }));
 
-const current = `actual-${Math.random().toString(36).slice(2).padEnd(8, 'x')}`;
-const next = `nueva-${Math.random().toString(36).slice(2).padEnd(8, 'y')}`;
+const current = 'ClaveActual123!';
+const next = 'ClaveNueva456!';
 async function fill(actual = current, nueva = next, confirmacion = nueva) {
   await fireEvent.changeText(screen.getByLabelText('Contraseña actual'), actual);
   await fireEvent.changeText(screen.getByLabelText('Nueva contraseña'), nueva);
@@ -71,7 +71,9 @@ test('solo una respuesta confirmada limpia campos, oculta contraseñas y muestra
   expect(mockCambiarPassword).toHaveBeenCalledWith(current, next);
   expect(screen.getByLabelText('Contraseña actual').props.value).toBe(current);
   resolve();
-  await waitFor(() => expect(screen.getByText('Tu contraseña se actualizó correctamente.')).toBeTruthy());
+  await waitFor(() => {
+    expect(screen.getByText('Tu contraseña se actualizó correctamente.')).toBeTruthy();
+  });
   for (const label of ['Contraseña actual', 'Nueva contraseña', 'Confirmar nueva contraseña']) {
     expect(screen.getByLabelText(label).props.value).toBe('');
     expect(screen.getByLabelText(label).props.secureTextEntry).toBe(true);

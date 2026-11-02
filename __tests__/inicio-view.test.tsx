@@ -53,15 +53,13 @@ test.each([
   });
 });
 
-test('la búsqueda envía el término ingresado al catálogo', () => {
+test('la búsqueda envía el término ingresado al catálogo', async () => {
   const user = userEvent.setup();
-  return render(<InicioView />).then(async () => {
-    const input = screen.getByLabelText('Buscar en el catálogo…');
-    await user.type(input, ' uñas ');
-    return fireEvent(input, 'submitEditing').then(() => {
-      expect(push).toHaveBeenCalledWith({ pathname: '/catalogo', params: { q: 'uñas' } });
-    });
-  });
+  await render(<InicioView />);
+  const input = screen.getByLabelText('Buscar en el catálogo…');
+  await user.type(input, ' uñas ');
+  await fireEvent(input, 'submitEditing');
+  expect(push).toHaveBeenCalledWith({ pathname: '/catalogo', params: { q: 'uñas' } });
 });
 
 test('muestra la cita real una vez y abre Agenda', () => {

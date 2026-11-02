@@ -11,32 +11,34 @@ export type ErrorContext =
   | 'agregar-carrito' | 'cantidad-carrito' | 'eliminar-carrito' | 'seleccionar-comprobante' | 'subir-comprobante'
   | 'cambiar-password' | 'editar-perfil' | 'recuperar-password';
 
-const fallback: Record<ErrorContext, string> = {
-  general: 'No pudimos completar la operación. Inténtalo nuevamente.',
-  cursos: 'No pudimos cargar los cursos. Inténtalo nuevamente.',
-  'mis-cursos': 'No pudimos cargar tus cursos. Inténtalo nuevamente.',
-  servicios: 'No pudimos cargar los servicios. Inténtalo nuevamente.',
-  productos: 'No pudimos cargar los productos. Inténtalo nuevamente.',
-  horarios: 'No pudimos cargar los horarios disponibles. Inténtalo nuevamente.',
-  agenda: 'No pudimos cargar tus citas. Inténtalo nuevamente.',
-  compras: 'No pudimos cargar tus compras. Inténtalo nuevamente.',
-  carrito: 'No pudimos cargar tu carrito. Inténtalo nuevamente.',
-  perfil: 'No pudimos cargar tu perfil. Inténtalo nuevamente.',
-  favoritos: 'No pudimos cargar tus favoritos. Inténtalo nuevamente.',
-  'cambiar-favorito': 'No pudimos actualizar tus favoritos. Inténtalo nuevamente.',
-  inscripcion: 'No pudimos completar tu inscripción. Inténtalo nuevamente.',
-  reserva: 'No pudimos confirmar tu cita. Inténtalo nuevamente.',
-  'cancelar-cita': 'No pudimos cancelar tu cita. Inténtalo nuevamente.',
-  pedido: 'No pudimos completar tu pedido. Inténtalo nuevamente.',
-  'agregar-carrito': 'No pudimos agregar el producto al carrito. Inténtalo nuevamente.',
-  'cantidad-carrito': 'No pudimos actualizar la cantidad. Inténtalo nuevamente.',
-  'eliminar-carrito': 'No pudimos eliminar el producto del carrito. Inténtalo nuevamente.',
-  'seleccionar-comprobante': 'No pudimos abrir el archivo seleccionado. Inténtalo nuevamente.',
-  'subir-comprobante': 'No pudimos subir tu comprobante. Inténtalo nuevamente.',
-  'cambiar-password': 'No pudimos cambiar tu contraseña. Inténtalo nuevamente.',
-  'editar-perfil': 'No pudimos actualizar tu perfil. Inténtalo nuevamente.',
-  'recuperar-password': 'No pudimos completar la recuperación. Inténtalo nuevamente.',
-};
+const generalFallback = 'No pudimos completar la operación. Inténtalo nuevamente.';
+const fallback = new Map<ErrorContext, string>([
+  ['general', generalFallback],
+  ['cursos', 'No pudimos cargar los cursos. Inténtalo nuevamente.'],
+  ['mis-cursos', 'No pudimos cargar tus cursos. Inténtalo nuevamente.'],
+  ['servicios', 'No pudimos cargar los servicios. Inténtalo nuevamente.'],
+  ['productos', 'No pudimos cargar los productos. Inténtalo nuevamente.'],
+  ['horarios', 'No pudimos cargar los horarios disponibles. Inténtalo nuevamente.'],
+  ['agenda', 'No pudimos cargar tus citas. Inténtalo nuevamente.'],
+  ['compras', 'No pudimos cargar tus compras. Inténtalo nuevamente.'],
+  ['carrito', 'No pudimos cargar tu carrito. Inténtalo nuevamente.'],
+  ['perfil', 'No pudimos cargar tu perfil. Inténtalo nuevamente.'],
+  ['favoritos', 'No pudimos cargar tus favoritos. Inténtalo nuevamente.'],
+  ['cambiar-favorito', 'No pudimos actualizar tus favoritos. Inténtalo nuevamente.'],
+  ['inscripcion', 'No pudimos completar tu inscripción. Inténtalo nuevamente.'],
+  ['reserva', 'No pudimos confirmar tu cita. Inténtalo nuevamente.'],
+  ['cancelar-cita', 'No pudimos cancelar tu cita. Inténtalo nuevamente.'],
+  ['pedido', 'No pudimos completar tu pedido. Inténtalo nuevamente.'],
+  ['agregar-carrito', 'No pudimos agregar el producto al carrito. Inténtalo nuevamente.'],
+  ['cantidad-carrito', 'No pudimos actualizar la cantidad. Inténtalo nuevamente.'],
+  ['eliminar-carrito', 'No pudimos eliminar el producto del carrito. Inténtalo nuevamente.'],
+  ['seleccionar-comprobante', 'No pudimos abrir el archivo seleccionado. Inténtalo nuevamente.'],
+  ['subir-comprobante', 'No pudimos subir tu comprobante. Inténtalo nuevamente.'],
+  ['cambiar-password', 'No pudimos cambiar tu contraseña. Inténtalo nuevamente.'],
+  ['editar-perfil', 'No pudimos actualizar tu perfil. Inténtalo nuevamente.'],
+  ['recuperar-password', 'No pudimos completar la recuperación. Inténtalo nuevamente.'],
+]);
+const fallbackMessage = (area: ErrorContext) => fallback.get(area) ?? generalFallback;
 
 function contextForPath(path: string): ErrorContext {
   if (/^\/api\/cursos\/[^/]+\/inscribir$/.test(path)) return 'inscripcion';
@@ -88,22 +90,22 @@ function knownBackendMessage(path: string, status: number, value: unknown): stri
   return null;
 }
 
-const localMessages: Record<string, string> = {
-  'Ya estás inscrito en este curso. Consulta su estado en Mis cursos.': 'Ya tienes una inscripción registrada para este curso.',
-  'Ya existe una inscripción anterior para este curso. Consulta su estado en Mis cursos.': 'Ya existe una inscripción anterior para este curso. Consulta su estado en Mis cursos.',
-  'La disponibilidad cambió. Selecciona otra fecha u hora antes de confirmar.': 'Ese horario ya no está disponible. Selecciona otro.',
-  'El comprobante no puede superar 10 MB.': 'El archivo supera el tamaño permitido.',
-  'El archivo seleccionado está vacío. Elige otro comprobante.': 'El archivo está vacío. Selecciona otro comprobante.',
-  'Selecciona un archivo JPG, PNG, WEBP, GIF o PDF.': 'Este formato de archivo no es compatible.',
-  'No se pudo abrir el archivo seleccionado en el dispositivo. Vuelve a seleccionarlo.': 'No pudimos abrir el archivo seleccionado. Inténtalo nuevamente.',
-  'No se pudo preparar el archivo seleccionado en el dispositivo. Vuelve a seleccionarlo.': 'No pudimos abrir el archivo seleccionado. Inténtalo nuevamente.',
-  'El archivo preparado ya no está disponible. Selecciónalo de nuevo.': 'Selecciona de nuevo el comprobante.',
-  'El nombre del archivo no es válido.': 'Selecciona otro archivo para continuar.',
-  'Primero registra el pedido.': 'Primero confirma el pedido.',
-  'Primero registra la cita.': 'Primero confirma la cita.',
-  'La confirmación del pedido ya está en curso.': 'Tu pedido ya se está confirmando. Espera un momento.',
-  'Este pago no admite otro comprobante. Actualiza su estado.': 'Este pago no permite enviar otro comprobante.',
-};
+const localMessages = new Map([
+  ['Ya estás inscrito en este curso. Consulta su estado en Mis cursos.', 'Ya tienes una inscripción registrada para este curso.'],
+  ['Ya existe una inscripción anterior para este curso. Consulta su estado en Mis cursos.', 'Ya existe una inscripción anterior para este curso. Consulta su estado en Mis cursos.'],
+  ['La disponibilidad cambió. Selecciona otra fecha u hora antes de confirmar.', 'Ese horario ya no está disponible. Selecciona otro.'],
+  ['El comprobante no puede superar 10 MB.', 'El archivo supera el tamaño permitido.'],
+  ['El archivo seleccionado está vacío. Elige otro comprobante.', 'El archivo está vacío. Selecciona otro comprobante.'],
+  ['Selecciona un archivo JPG, PNG, WEBP, GIF o PDF.', 'Este formato de archivo no es compatible.'],
+  ['No se pudo abrir el archivo seleccionado en el dispositivo. Vuelve a seleccionarlo.', 'No pudimos abrir el archivo seleccionado. Inténtalo nuevamente.'],
+  ['No se pudo preparar el archivo seleccionado en el dispositivo. Vuelve a seleccionarlo.', 'No pudimos abrir el archivo seleccionado. Inténtalo nuevamente.'],
+  ['El archivo preparado ya no está disponible. Selecciónalo de nuevo.', 'Selecciona de nuevo el comprobante.'],
+  ['El nombre del archivo no es válido.', 'Selecciona otro archivo para continuar.'],
+  ['Primero registra el pedido.', 'Primero confirma el pedido.'],
+  ['Primero registra la cita.', 'Primero confirma la cita.'],
+  ['La confirmación del pedido ya está en curso.', 'Tu pedido ya se está confirmando. Espera un momento.'],
+  ['Este pago no admite otro comprobante. Actualiza su estado.', 'Este pago no permite enviar otro comprobante.'],
+]);
 
 export function userError(error: unknown, context?: ErrorContext): { kind: UserErrorKind; message: string } {
   if (error instanceof UserFacingError) return { kind: 'validacion', message: error.message };
@@ -120,20 +122,23 @@ export function userError(error: unknown, context?: ErrorContext): { kind: UserE
     if (kind === 'sesion') return { kind, message: 'Tu sesión ha expirado. Inicia sesión nuevamente.' };
     if (kind === 'permiso') return { kind, message: 'No tienes permiso para realizar esta acción.' };
     if (error.status === 404) return { kind, message: area === 'productos' ? 'Este producto ya no está disponible.' : 'La información solicitada ya no está disponible.' };
-    return { kind, message: fallback[area] };
+    return { kind, message: fallbackMessage(area) };
   }
   if (error instanceof ModelNotFoundError) return { kind: 'respuesta', message: error.entity.toLowerCase() === 'producto'
     ? 'Este producto ya no está disponible.' : 'La información solicitada ya no está disponible.' };
   if (error instanceof AdapterError) return { kind: 'respuesta', message: error.path.startsWith('config-sitio.')
-    ? 'Los datos bancarios aún no están disponibles. Inténtalo más tarde.' : fallback[area] };
+    ? 'Los datos bancarios aún no están disponibles. Inténtalo más tarde.' : fallbackMessage(area) };
   if (error instanceof SessionDataError) return { kind: 'sesion', message: 'Tu sesión ha expirado. Inicia sesión nuevamente.' };
-  if (error instanceof InputError) return { kind: 'validacion', message: localMessages[error.message] ?? fallback[area] };
+  if (error instanceof InputError) return { kind: 'validacion', message: localMessages.get(error.message) ?? fallbackMessage(area) };
   if (error instanceof TypeError && /fetch failed|failed to fetch|network request failed|networkerror|load failed|unable to resolve host/i.test(error.message)) {
     return { kind: 'conexion', message: area === 'pedido'
       ? 'No pudimos confirmar el estado de tu pedido. Revisa Mis compras antes de intentarlo nuevamente.'
       : 'No pudimos conectarnos. Revisa tu conexión e inténtalo nuevamente.' };
   }
   if (error instanceof Error && error.name === 'TimeoutError') return { kind: 'conexion', message: 'La operación está tardando demasiado. Inténtalo nuevamente.' };
-  if (error instanceof Error && localMessages[error.message]) return { kind: 'validacion', message: localMessages[error.message] };
-  return { kind: 'respuesta', message: fallback[area] };
+  if (error instanceof Error) {
+    const knownLocalMessage = localMessages.get(error.message);
+    if (knownLocalMessage) return { kind: 'validacion', message: knownLocalMessage };
+  }
+  return { kind: 'respuesta', message: fallbackMessage(area) };
 }

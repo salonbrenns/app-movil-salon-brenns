@@ -88,7 +88,9 @@ export default function FinalizarCompraView() {
         </View>
         <Button label="Confirmar pedido" loading={vm.ocupado} disabled={!vm.perfil || !vm.existenciasValidas || !vm.transferencia.datos || !!vm.transferencia.error || vm.transferencia.cargando || vm.cargando || vm.ocupado} onPress={() => {
           const snapshot = { items: vm.items, subtotal: vm.resumen?.subtotal ?? '' };
-          void vm.confirmarPedido(() => setResumenConfirmado(snapshot));
+          void vm.confirmarPedido(() => {
+            setResumenConfirmado(snapshot);
+          });
         }} />
       </>}
       </View>

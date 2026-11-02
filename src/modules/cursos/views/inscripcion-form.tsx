@@ -17,6 +17,7 @@ import { Colors, Spacing } from '@/theme';
 
 export function InscripcionForm({ curso, onPayment }: { curso: Curso; onPayment?: (pagoId: string) => void }) {
   const vm = useInscripcionViewModel(curso);
+  const pagoId = vm.pagoId;
   const { status } = useAuthSession();
   const [confirming, setConfirming] = useState(false);
   const continuePayment = (pagoId: string) => { if (onPayment) onPayment(pagoId); else router.push({ pathname: '/pago', params: { tipo: 'curso', id: pagoId } }); };
@@ -40,7 +41,9 @@ export function InscripcionForm({ curso, onPayment }: { curso: Curso; onPayment?
       <ThemedText type="subtitle">Confirmación y comprobante</ThemedText>
       {vm.permitido ? <ThemedText type="small" themeColor="textSecondary">Podrás adjuntar el comprobante después de registrar la inscripción.</ThemedText> : <ThemedText type="small">Las inscripciones están disponibles para cuentas de cliente.</ThemedText>}
       {vm.inscrito && vm.proofReceived ? <StatusMessage message="Comprobante enviado correctamente. Consulta el estado de revisión en Mis cursos." tone="info" /> : null}
-      {vm.inscrito && vm.pagoId && !vm.proofReceived ? <Button label="Continuar al pago" onPress={() => continuePayment(vm.pagoId!)} /> : null}
+      {vm.inscrito && pagoId && !vm.proofReceived ? <Button label="Continuar al pago" onPress={() => {
+        continuePayment(pagoId);
+      }} /> : null}
       {vm.inscrito && !vm.pagoId ? <StatusMessage message="Ya existe una inscripción para este curso. Consulta su estado en Mis cursos." tone="info" /> : null}
       {vm.sinCupo ? <ThemedText type="small">El cupo del curso está completo.</ThemedText> : null}
       {!vm.inscrito && vm.finalizado ? <StatusMessage message="Este curso ya terminó. Consulta los próximos cursos disponibles." tone="info" /> : null}

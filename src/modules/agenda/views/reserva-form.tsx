@@ -13,6 +13,7 @@ import type { Servicio } from '@/modules/servicios/models/servicio';
 
 export function ReservaForm({ servicio }: { servicio: Servicio }) {
   const vm = useReservaViewModel(servicio);
+  const hora = vm.hora;
   if (!vm.authenticated) return <Link href={{ pathname: '/autenticacion', params: { returnTo: '/servicios?id=' + servicio.id } }} asChild><Button label="Inicia sesión para agendar" /></Link>;
   return <View style={styles.form}>
     <ThemedText type="subtitle">Agenda tu cita</ThemedText>
@@ -24,8 +25,8 @@ export function ReservaForm({ servicio }: { servicio: Servicio }) {
     {vm.conflicto ? <StatusMessage message={vm.conflicto} tone="info" /> : null}
     {vm.fecha ? <ThemedText type="label">2. Elige un horario disponible</ThemedText> : null}
     <HorariosSelector horarios={vm.horarios} selected={vm.hora} onSelect={vm.cambiarHora} disabled={vm.ocupado || vm.cargando} />
-    {vm.hora ? <Button label="Continuar con la reserva" disabled={!vm.puedeContinuar} onPress={() => {
-      router.push({ pathname: '/pago-servicio', params: { id: servicio.id, fecha: vm.fecha, hora: vm.hora! } } as unknown as Href);
+    {hora ? <Button label="Continuar con la reserva" disabled={!vm.puedeContinuar} onPress={() => {
+      router.push({ pathname: '/pago-servicio', params: { id: servicio.id, fecha: vm.fecha, hora } } as unknown as Href);
     }} /> : null}
   </View>;
 }

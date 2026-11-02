@@ -15,6 +15,13 @@ export function useSeguridadViewModel() {
   function cambiarActual(value: string) { setActual(value); setError(null); setGuardado(false); }
   function cambiarNueva(value: string) { setNueva(value); setError(null); setGuardado(false); }
   function cambiarConfirmacion(value: string) { setConfirmacion(value); setError(null); setGuardado(false); }
+  function alternarVisibilidad(campo: keyof typeof visibilidad) {
+    setVisibilidad((value) => {
+      if (campo === 'actual') return { ...value, actual: !value.actual };
+      if (campo === 'nueva') return { ...value, nueva: !value.nueva };
+      return { ...value, confirmacion: !value.confirmacion };
+    });
+  }
   async function guardar() {
     if (enviando.current) return;
     setGuardado(false);
@@ -34,6 +41,6 @@ export function useSeguridadViewModel() {
     finally { enviando.current = false; setOcupado(false); }
   }
   return { actual, setActual: cambiarActual, nueva, setNueva: cambiarNueva, confirmacion, setConfirmacion: cambiarConfirmacion,
-    visibilidad, alternarVisibilidad: (campo: keyof typeof visibilidad) => setVisibilidad((value) => ({ ...value, [campo]: !value[campo] })),
+    visibilidad, alternarVisibilidad,
     ocupado, error, guardado, guardar };
 }
