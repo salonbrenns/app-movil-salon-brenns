@@ -209,7 +209,7 @@ test("ARCO valida campos, correo, datos involucrados y cambio de rectificación"
 test("ARCO conserva los datos y permite copiar correo y solicitud cuando falla la app de correo", async () => {
   openURL.mockRejectedValue(new Error("Sin aplicación"));
   const user = userEvent.setup();
-  await render(<ArcoRequestView />);
+  await Promise.resolve(render(<ArcoRequestView />));
   await user.paste(
     screen.getByLabelText("Nombre completo"),
     "Ana López",
@@ -279,7 +279,7 @@ test("eliminación permite cancelar, precarga la sesión y no borra ni cierra se
   });
   openURL.mockResolvedValue(true);
   const user = userEvent.setup();
-  await render(<AccountDeletionView />);
+  await Promise.resolve(render(<AccountDeletionView />));
   await user.press(
     screen.getByRole("button", { name: "Solicitar eliminación de cuenta" }),
   );
@@ -315,7 +315,7 @@ test("eliminación permite cancelar, precarga la sesión y no borra ni cierra se
 test("eliminación funciona sin sesión y conserva campos cuando falla el correo", async () => {
   openURL.mockRejectedValue(new Error("Sin aplicación"));
   const user = userEvent.setup();
-  await render(<AccountDeletionView />);
+  await Promise.resolve(render(<AccountDeletionView />));
   await user.press(
     screen.getByRole("button", { name: "Solicitar eliminación de cuenta" }),
   );
@@ -350,7 +350,7 @@ test("eliminación funciona sin sesión y conserva campos cuando falla el correo
 test("soporte informa el fallo del correo y conserva la dirección copiable", async () => {
   openURL.mockRejectedValue(new Error("No mail app"));
   const user = userEvent.setup();
-  await render(<SupportContact />);
+  await Promise.resolve(render(<SupportContact />));
   await user.press(screen.getByRole("button", { name: "Contactar soporte" }));
   await waitFor(() => {
     expect(
