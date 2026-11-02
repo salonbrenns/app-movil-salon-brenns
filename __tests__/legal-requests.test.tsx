@@ -169,7 +169,7 @@ test.each(ARCO_RIGHTS)(
 );
 
 test("ARCO valida campos, correo, datos involucrados y cambio de rectificación", async () => {
-  const { result } = await renderHook(useArcoRequestViewModel);
+  const { result } = await Promise.resolve(renderHook(useArcoRequestViewModel));
   await act(async () => {
     await result.current.prepare();
   });
@@ -253,7 +253,7 @@ test("ARCO evita abrir dos borradores mientras la primera apertura está pendien
         complete = resolve;
       }),
   );
-  const { result } = await renderHook(useArcoRequestViewModel);
+  const { result } = await Promise.resolve(renderHook(useArcoRequestViewModel));
   await act(() => {
     result.current.setName("Ana");
     result.current.setEmail("ana@example.com");
