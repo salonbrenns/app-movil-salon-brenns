@@ -8,6 +8,8 @@
     "scheme": "appmovilbrenns",
     "userInterfaceStyle": "light",
     "android": {
+      "package": "com.salonbrenns.appmovilbrenns",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#FFFFFF",
         "foregroundImage": "./assets/images/brenns-adaptive-icon.png"
