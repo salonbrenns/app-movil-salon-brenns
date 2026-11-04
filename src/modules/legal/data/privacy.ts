@@ -1,91 +1,60 @@
 import type { LegalDocument } from '../models/legal-document';
-import { business } from './business';
 
 export const privacyDocument: LegalDocument = {
   "title": "Aviso de privacidad",
-  "status": "draft",
+  "status": "approved",
+  "version": "1.0",
+  "updatedAt": "2026-11-03",
   "sections": [
     {
       "number": 1,
-      "title": "Identidad del responsable",
+      "title": "Identidad y domicilio de la responsable",
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "Academia, Distribuidora y Salón Brenn's es el nombre comercial del establecimiento que opera la aplicación móvil Salón Brenn's."
+          "text": "Brenda Hernandez Garcia, quien opera comercialmente bajo el nombre Academia, Distribuidora y Salón Brenn's, es responsable del tratamiento y protección de los datos personales obtenidos mediante la aplicación móvil Salón Brenn's."
         },
         {
           "kind": "paragraph",
-          "text": "Dirección del establecimiento: Pl. de la Revolución Mexicana 5, Centro, Huejutla de Reyes, Hidalgo, México."
+          "text": "Domicilio: Plaza de la Revolución Mexicana 5, Centro, Huejutla de Reyes, Hidalgo, México."
         },
         {
           "kind": "paragraph",
-          "text": `Correo para asuntos de privacidad: ${business.email}.`
+          "text": "Correo de contacto: salonbrenns11@gmail.com"
         },
         {
           "kind": "paragraph",
-          "text": "La identidad legal y el domicilio del responsable del tratamiento están pendientes de verificación antes de aprobar este aviso."
+          "text": "Sitio web: https://brenns-sistema.vercel.app/"
+        },
+        {
+          "kind": "paragraph",
+          "text": "El tratamiento de datos personales se realiza conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares y demás disposiciones aplicables."
         }
       ]
     },
     {
       "number": 2,
-      "title": "Datos personales utilizados",
+      "title": "Datos personales recopilados",
       "blocks": [
         {
-          "kind": "subheading",
-          "text": "Identificación, contacto y cuenta"
+          "kind": "paragraph",
+          "text": "La aplicación móvil trata los datos necesarios para proporcionar las funciones solicitadas por sus usuarios."
         },
         {
           "kind": "list",
           "items": [
-            "Nombre completo, correo electrónico y número de teléfono.",
-            "Credenciales y datos necesarios para autenticar y proteger la cuenta."
-          ]
-        },
-        {
-          "kind": "subheading",
-          "text": "Servicios y citas"
-        },
-        {
-          "kind": "list",
-          "items": [
-            "Servicios elegidos, fechas y horarios de citas, historial de reservas, estados y cancelaciones."
-          ]
-        },
-        {
-          "kind": "subheading",
-          "text": "Cursos"
-        },
-        {
-          "kind": "list",
-          "items": [
-            "Cursos elegidos, inscripciones y su estado, así como pagos asociados que devuelve el sistema."
-          ]
-        },
-        {
-          "kind": "subheading",
-          "text": "Compras"
-        },
-        {
-          "kind": "list",
-          "items": [
-            "Productos seleccionados y comprados, cantidades, importes, historial y estado de pedidos."
-          ]
-        },
-        {
-          "kind": "subheading",
-          "text": "Transferencias"
-        },
-        {
-          "kind": "list",
-          "items": [
-            "Referencias de operación y estado de revisión cuando estén disponibles.",
-            "Imágenes o documentos de comprobantes de transferencia enviados para pedidos, citas y cursos, incluidos los datos personales que contengan."
+            "Datos de identificación y contacto: nombre completo, correo electrónico y número de teléfono.",
+            "Datos de cuenta y autenticación: información de registro, credenciales de acceso protegidas y datos de sesión necesarios para autenticar a los usuarios.",
+            "Datos de citas y servicios: servicios seleccionados, fechas, horarios, reservaciones, estados de las citas y cancelaciones.",
+            "Datos de cursos: cursos seleccionados, inscripciones, fechas, estados de inscripción y operaciones de pago relacionadas.",
+            "Datos de compras: productos, variantes, cantidades, precios, pedidos, estados e historial de compras.",
+            "Datos de pagos: referencias de operaciones, comprobantes de transferencias bancarias y estados de revisión. Los documentos proporcionados pueden contener información financiera visible, por lo que se recomienda no incluir datos innecesarios.",
+            "Datos técnicos: información necesaria para establecer comunicaciones con el servidor, gestionar sesiones y proteger las operaciones, incluidos los registros técnicos que genere la infraestructura utilizada."
           ]
         },
         {
           "kind": "paragraph",
-          "text": "La aplicación no solicita direcciones particulares de entrega."
+          "text": "La aplicación no solicita direcciones particulares para entregas, ya que los productos se recogen en el establecimiento."
         }
       ]
     },
@@ -95,39 +64,88 @@ export const privacyDocument: LegalDocument = {
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "La información se utiliza para crear y administrar cuentas, permitir el inicio de sesión, gestionar citas de belleza, registrar inscripciones a cursos, procesar pedidos, revisar los comprobantes disponibles, informar el estado de las operaciones, atender solicitudes de clientes, facilitar la consulta y actualización de datos, atender derechos ARCO y cumplir obligaciones legales aplicables."
+          "text": "Los datos personales se utilizan para:"
+        },
+        {
+          "kind": "list",
+          "items": [
+            "Crear y administrar cuentas de usuario.",
+            "Permitir el inicio y cierre de sesión.",
+            "Consultar productos, servicios y cursos.",
+            "Registrar, consultar y cancelar citas conforme a las políticas aplicables.",
+            "Administrar inscripciones a cursos.",
+            "Registrar pedidos y compras de productos.",
+            "Recibir comprobantes de transferencia bancaria y verificar los pagos.",
+            "Mostrar historiales y estados de operaciones.",
+            "Permitir la consulta y modificación de información del perfil.",
+            "Atender solicitudes de ayuda, derechos ARCO y eliminación de cuentas.",
+            "Proteger las cuentas y prevenir operaciones no autorizadas.",
+            "Cumplir las obligaciones legales correspondientes."
+          ]
         },
         {
           "kind": "paragraph",
-          "text": "La aplicación no solicita consentimiento para promociones mediante la aceptación de Términos. Cualquier finalidad comercial opcional futura requerirá un mecanismo independiente conforme a la ley."
+          "text": "La aceptación de los términos de la aplicación no implica, por sí misma, consentimiento para recibir promociones."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Cualquier tratamiento adicional con fines publicitarios o comerciales deberá informarse al usuario y contar con los mecanismos de consentimiento u oposición que legalmente correspondan."
         }
       ]
     },
     {
       "number": 4,
-      "title": "Protección y conservación",
+      "title": "Almacenamiento, proveedores y comunicación de datos",
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "Los datos personales deberán tratarse con las medidas de seguridad correspondientes y conservarse sólo durante el tiempo necesario para las finalidades informadas y las obligaciones legales aplicables."
+          "text": "La aplicación móvil se comunica con los servicios del sistema de Salón Brenn's para realizar las operaciones solicitadas."
         },
         {
           "kind": "paragraph",
-          "text": "Los mecanismos concretos de seguridad, conservación y supresión del sistema están pendientes de verificación antes de aprobar este aviso."
+          "text": "En esta infraestructura intervienen proveedores tecnológicos relacionados con:"
+        },
+        {
+          "kind": "list",
+          "items": [
+            "Vercel: alojamiento y funcionamiento del sistema y su API.",
+            "Neon: almacenamiento de información en la base de datos del sistema.",
+            "Cloudinary: almacenamiento de imágenes y comprobantes relacionados con las operaciones que lo requieren."
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Estos servicios pueden procesar información necesaria para proporcionar sus funciones y estarán sujetos a las condiciones contractuales y legales correspondientes."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Salón Brenn's no comunicará datos personales a terceros para finalidades ajenas a las informadas sin cumplir los requisitos de consentimiento o las excepciones establecidos por la legislación aplicable."
         }
       ]
     },
     {
       "number": 5,
-      "title": "Compartición de información",
+      "title": "Seguridad de la información",
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "Podrán intervenir proveedores tecnológicos que participen efectivamente en la operación de la aplicación y del sistema, bajo las condiciones legales correspondientes."
+          "text": "La aplicación utiliza conexiones HTTPS para comunicarse con su servidor de producción y mecanismos de autenticación para controlar el acceso a las cuentas."
         },
         {
           "kind": "paragraph",
-          "text": "Las transferencias a terceros y la identidad de los proveedores efectivos deben verificarse, documentarse e informarse conforme a la legislación aplicable."
+          "text": "La información de sesión se almacena mediante mecanismos protegidos del dispositivo cuando corresponde."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Las contraseñas se procesan mediante los mecanismos de autenticación del sistema y no se muestran en texto legible en la aplicación."
+        },
+        {
+          "kind": "paragraph",
+          "text": "La información personal y las operaciones administrativas deben estar protegidas mediante controles de acceso y medidas técnicas y administrativas apropiadas."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Salón Brenn's deberá revisar y actualizar sus medidas de seguridad de acuerdo con los riesgos asociados al tratamiento de datos personales."
         }
       ]
     },
@@ -137,33 +155,148 @@ export const privacyDocument: LegalDocument = {
       "blocks": [
         {
           "kind": "paragraph",
-          "text": `Las personas usuarias pueden solicitar Acceso, Rectificación, Cancelación y Oposición respecto de sus datos personales mediante un correo a ${business.email} o preparando el mensaje desde la pantalla Derechos ARCO.`
+          "text": "Los usuarios pueden ejercer sus derechos de:"
+        },
+        {
+          "kind": "list",
+          "items": [
+            "Acceso: conocer los datos personales sujetos a tratamiento.",
+            "Rectificación: solicitar la corrección de información inexacta o incompleta.",
+            "Cancelación: solicitar la cancelación de datos cuando proceda legalmente.",
+            "Oposición: oponerse a determinados tratamientos en los supuestos previstos por la legislación."
+          ]
         },
         {
           "kind": "paragraph",
-          "text": "La solicitud deberá identificar a la persona titular, indicar el derecho y aportar la información necesaria para atenderlo. La identidad se verificará mediante un procedimiento adecuado y seguro; la app no pide ni adjunta identificaciones oficiales."
+          "text": "Las solicitudes pueden prepararse mediante el apartado Derechos ARCO de la aplicación o enviarse directamente al correo:"
         },
         {
           "kind": "paragraph",
-          "text": "Incluye tu nombre, un correo para recibir respuesta, la descripción del derecho solicitado y los datos involucrados cuando corresponda. Para rectificar, indica el cambio y aporta el sustento por el mecanismo seguro que defina el responsable. El establecimiento deberá verificar identidad o representación antes de entregar información o ejecutar cambios."
+          "text": "salonbrenns11@gmail.com"
         },
         {
           "kind": "paragraph",
-          "text": "De conformidad con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, la determinación se comunicará dentro de un plazo máximo general de 20 días hábiles desde la recepción de la solicitud y, si procede, se hará efectiva dentro de los 15 días hábiles siguientes a la comunicación de la respuesta. Los plazos pueden ampliarse una sola vez por un periodo igual si las circunstancias lo justifican; una negativa total o parcial deberá explicarse."
+          "text": "El solicitante deberá proporcionar su nombre, un medio para recibir respuesta, el derecho que desea ejercer y una descripción de la solicitud."
         },
         {
           "kind": "paragraph",
-          "text": "La solicitud de eliminación de cuenta puede presentarse por el mismo correo. No produce un borrado inmediato: el responsable deberá verificar la identidad, revisar obligaciones legales de conservación y comunicar el resultado. Para pedir información adicional sobre el procedimiento, escribe al correo de privacidad indicado arriba."
+          "text": "Una persona encargada dará seguimiento y, cuando corresponda, indicará un procedimiento seguro para verificar la identidad del titular o de su representante."
+        },
+        {
+          "kind": "paragraph",
+          "text": "No se deben enviar contraseñas ni documentos de identificación por medios inseguros."
+        },
+        {
+          "kind": "paragraph",
+          "text": "La determinación sobre la solicitud ARCO se comunicará, en términos generales, dentro de los 20 días hábiles siguientes a su recepción. Si resulta procedente, se hará efectiva dentro de los 15 días hábiles siguientes a la comunicación, sin perjuicio de las ampliaciones permitidas por la ley."
         }
       ]
     },
     {
       "number": 7,
-      "title": "Cambios en el aviso",
+      "title": "Eliminación de cuenta",
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "Las modificaciones relevantes se comunicarán por los mecanismos oficiales que determine Salón Brenn's. La versión y la fecha de actualización se mostrarán cuando este documento haya sido aprobado."
+          "text": "El usuario puede solicitar la eliminación de su cuenta de Salón Brenn's y de los datos personales asociados mediante:"
+        },
+        {
+          "kind": "list",
+          "items": [
+            "Desde la aplicación móvil: apartado Solicitar eliminación de cuenta.",
+            "Desde la página web: https://brenns-sistema.vercel.app/eliminar-cuenta",
+            "Por correo electrónico: salonbrenns11@gmail.com"
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Para iniciar una solicitud por correo deberá indicar su nombre completo y el correo registrado en la cuenta."
+        },
+        {
+          "kind": "paragraph",
+          "text": "La persona encargada recibirá la solicitud, verificará la identidad del titular mediante un procedimiento seguro y revisará los datos asociados."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Una vez completada la revisión, se eliminará la cuenta y la información personal que corresponda suprimir, incluidos los registros asociados que no deban conservarse por una causa legalmente justificada."
+        },
+        {
+          "kind": "paragraph",
+          "text": "La persona encargada comunicará al usuario el resultado de su solicitud."
+        },
+        {
+          "kind": "paragraph",
+          "text": "La apertura de un borrador de correo en la aplicación no significa que la solicitud haya sido enviada o recibida y no produce la eliminación automática de la cuenta."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Los usuarios pueden iniciar la solicitud desde la página web sin tener instalada la aplicación ni iniciar sesión."
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "Conservación de información",
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Los datos personales se conservarán durante el tiempo necesario para proporcionar los servicios solicitados, mantener las operaciones correspondientes y cumplir las obligaciones legales aplicables."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Cuando una cuenta sea eliminada, se revisarán los registros de autenticación, perfil, citas, cursos, compras, pagos y comprobantes asociados."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Los datos cuya conservación resulte necesaria para cumplir obligaciones legales, fiscales, de seguridad o prevención del fraude únicamente podrán mantenerse durante el periodo que corresponda y para las finalidades justificadas."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Los registros que ya no deban conservarse serán suprimidos conforme a los procedimientos aplicables."
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "title": "Permisos y archivos del dispositivo",
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "La aplicación permite seleccionar imágenes o documentos desde el dispositivo cuando el usuario decide proporcionar un comprobante de transferencia."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Los archivos seleccionados se utilizan para procesar la operación correspondiente y pueden transmitirse a los servicios de almacenamiento empleados por el sistema."
+        },
+        {
+          "kind": "paragraph",
+          "text": "El acceso a los archivos y los permisos del dispositivo se limitarán a las funciones implementadas y se solicitarán conforme a los mecanismos de Android que correspondan."
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "title": "Limitación, revocación y modificaciones",
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Los titulares pueden solicitar la limitación de determinados tratamientos o la revocación de su consentimiento, cuando legalmente proceda, mediante el correo:"
+        },
+        {
+          "kind": "paragraph",
+          "text": "salonbrenns11@gmail.com"
+        },
+        {
+          "kind": "paragraph",
+          "text": "La responsable atenderá las solicitudes conforme a la legislación aplicable e informará sobre las consecuencias que pueda tener la revocación para las funciones que requieran determinados datos."
+        },
+        {
+          "kind": "paragraph",
+          "text": "El presente aviso podrá modificarse cuando cambien las funcionalidades de la aplicación, los tratamientos realizados o las disposiciones legales correspondientes."
+        },
+        {
+          "kind": "paragraph",
+          "text": "La versión vigente estará disponible dentro de la aplicación móvil y en su página pública de privacidad."
         }
       ]
     }

@@ -12,22 +12,60 @@ const flatten = (key: LegalDocumentKey) => getLegalDocument(key).sections
   .flatMap((block) => block.kind === 'list' ? block.items ?? [] : block.text ?? [])
   .join(' ');
 
-test('incluye los seis borradores móviles y las condiciones críticas sin depender de la red', () => {
-  expect(legalDocuments.privacidad.sections).toHaveLength(7);
+test('el aviso móvil aprobado reproduce las diez secciones publicadas', () => {
+  const privacy = legalDocuments.privacidad;
+  expect(privacy.status).toBe('approved');
+  expect(privacy.version).toBe('1.0');
+  expect(privacy.updatedAt).toBe('2026-11-03');
+  expect(privacy.sections.map(({ number, title }) => [number, title])).toEqual([
+    [1, 'Identidad y domicilio de la responsable'],
+    [2, 'Datos personales recopilados'],
+    [3, 'Finalidades del tratamiento'],
+    [4, 'Almacenamiento, proveedores y comunicación de datos'],
+    [5, 'Seguridad de la información'],
+    [6, 'Derechos ARCO'],
+    [7, 'Eliminación de cuenta'],
+    [8, 'Conservación de información'],
+    [9, 'Permisos y archivos del dispositivo'],
+    [10, 'Limitación, revocación y modificaciones'],
+  ]);
+  expect(privacy.sections.every((section) => section.blocks.length > 0)).toBe(true);
+  const content = flatten('privacidad');
+  for (const detail of [
+    'Brenda Hernandez Garcia',
+    "Academia, Distribuidora y Salón Brenn's",
+    'Plaza de la Revolución Mexicana 5, Centro, Huejutla de Reyes, Hidalgo, México',
+    business.email,
+    'Vercel', 'Neon', 'Cloudinary', 'HTTPS',
+    'Acceso', 'Rectificación', 'Cancelación', 'Oposición',
+    '20 días hábiles', '15 días hábiles',
+    'https://brenns-sistema.vercel.app/eliminar-cuenta',
+    'por correo', 'no produce la eliminación automática',
+    'obligaciones legales', 'permisos del dispositivo', 'revocación de su consentimiento',
+  ]) {
+    expect(content).toContain(detail);
+  }
+  expect(content).not.toContain('pendientes de verificación');
+});
+
+test('los otros cinco documentos conservan sus borradores y condiciones críticas sin depender de la red', () => {
   expect(legalDocuments.terminos.sections).toHaveLength(9);
   expect(legalDocuments.politicas.sections).toHaveLength(3);
   expect(legalDocuments.compras.sections).toHaveLength(5);
   expect(legalDocuments.arco.sections).toHaveLength(3);
   expect(legalDocuments.eliminacion.sections).toHaveLength(2);
-  for (const document of Object.values(legalDocuments)) {
+  for (const document of [
+    legalDocuments.terminos,
+    legalDocuments.politicas,
+    legalDocuments.compras,
+    legalDocuments.arco,
+    legalDocuments.eliminacion,
+  ]) {
     expect(document.status).toBe('draft');
     expect(document.version).toBeUndefined();
     expect(document.updatedAt).toBeUndefined();
     expect(document.sections.every((section) => section.blocks.length > 0)).toBe(true);
   }
-  expect(flatten('privacidad')).toContain('Pl. de la Revolución Mexicana 5');
-  expect(flatten('privacidad')).toContain('20 días hábiles');
-  expect(flatten('privacidad')).toContain('15 días hábiles');
   expect(flatten('terminos')).toContain('transferencia bancaria');
   expect(flatten('politicas')).toContain('mínimo de 24 horas');
   expect(flatten('compras')).toContain('recogen directamente');
