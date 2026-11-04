@@ -54,8 +54,13 @@ test('los otros cinco documentos conservan sus borradores y condiciones crítica
   expect(legalDocuments.compras.sections).toHaveLength(5);
   expect(legalDocuments.arco.sections).toHaveLength(3);
   expect(legalDocuments.eliminacion.sections).toHaveLength(2);
-  for (const key of ['terminos', 'politicas', 'compras', 'arco', 'eliminacion'] as const) {
-    const document = legalDocuments[key];
+  for (const document of [
+    legalDocuments.terminos,
+    legalDocuments.politicas,
+    legalDocuments.compras,
+    legalDocuments.arco,
+    legalDocuments.eliminacion,
+  ]) {
     expect(document.status).toBe('draft');
     expect(document.version).toBeUndefined();
     expect(document.updatedAt).toBeUndefined();
