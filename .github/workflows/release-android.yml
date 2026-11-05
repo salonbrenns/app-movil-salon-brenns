@@ -1,0 +1,78 @@
+name: Android Release - AAB y Tag
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  android-release:
+    name: Generar AAB y tag
+    if: ${{ github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release/v') && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Verificar versión
+        env:
+          RELEASE_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          VERSION=$(node -p "require('./app.json').expo.version")
+
+          if [[ "$RELEASE_BRANCH" != "release/v$VERSION" ]]; then
+            echo "La rama release no coincide con la versión"
+            exit 1
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" > /dev/null 2>&1; then
+            echo "El tag ya existe"
+            exit 1
+          fi
+
+          echo "RELEASE_VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Configurar Expo y EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar ESLint
+        run: npm run lint
+
+      - name: Verificar TypeScript
+        run: npm run typecheck
+
+      - name: Pruebas legacy
+        run: npm run test:legacy
+
+      - name: Pruebas Jest
+        run: npx jest --runInBand --testTimeout=20000
+
+      - name: Generar AAB
+        run: eas build --platform android --profile production --non-interactive --wait
+
+      - name: Crear tag automático
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git tag -a "v${RELEASE_VERSION}" -m "Release Android v${RELEASE_VERSION}"
+          git push origin "v${RELEASE_VERSION}"
