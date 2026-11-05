@@ -1,0 +1,124 @@
+name: Android Release - AAB y Tag
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  verificar-release:
+    name: Verificar merge desde release
+    runs-on: ubuntu-latest
+
+    outputs:
+      publicar: ${{ steps.verificar.outputs.publicar }}
+      version: ${{ steps.verificar.outputs.version }}
+
+    steps:
+      - name: Obtener codigo
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+
+      - name: Verificar origen del merge
+        id: verificar
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          echo "publicar=false" >> "$GITHUB_OUTPUT"
+
+          PRS=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/pulls")
+
+          RAMA=$(echo "$PRS" | jq -r --arg sha "$GITHUB_SHA" '
+            .[]
+            | select(
+                .merged_at != null
+                and .base.ref == "main"
+                and (.head.ref | startswith("release/v"))
+                and .merge_commit_sha == $sha
+              )
+            | .head.ref
+          ' | head -n 1)
+
+          if [[ -z "$RAMA" ]]; then
+            echo "No es un merge de release hacia main."
+            exit 0
+          fi
+
+          VERSION=$(node -p "require('./app.json').expo.version")
+
+          if [[ "$RAMA" != "release/v$VERSION" ]]; then
+            echo "La rama release no coincide con app.json"
+            exit 1
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" > /dev/null 2>&1; then
+            echo "El tag v$VERSION ya existe"
+            exit 1
+          fi
+
+          echo "publicar=true" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Release verificada: v$VERSION"
+
+  android-release:
+    name: Generar AAB y tag
+    needs: verificar-release
+    if: needs.verificar-release.outputs.publicar == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obtener codigo de main
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar ESLint
+        run: npm run lint
+
+      - name: Verificar TypeScript
+        run: npm run typecheck
+
+      - name: Ejecutar pruebas legacy
+        run: npm run test:legacy
+
+      - name: Ejecutar pruebas Jest
+        run: npx jest --runInBand --testTimeout=20000
+
+      - name: Configurar Expo y EAS
+        uses: expo/expo-github-action@c7b66a9c327a43a8fa7c0158e7f30d6040d2481e # v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Generar AAB de produccion
+        run: eas build --platform android --profile production --non-interactive --wait
+
+      - name: Crear y subir tag automatico
+        env:
+          RELEASE_VERSION: ${{ needs.verificar-release.outputs.version }}
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git tag -a "v${RELEASE_VERSION}" -m "Release Android v${RELEASE_VERSION}"
+          git push origin "v${RELEASE_VERSION}"

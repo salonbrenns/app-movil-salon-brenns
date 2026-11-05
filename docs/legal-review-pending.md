@@ -1,0 +1,18 @@
+# Revisión pendiente antes de publicar los documentos móviles
+
+Los seis textos integrados en la app son **borradores sin versión ni fecha de aprobación**. Se basan en la solicitud del propietario del 24 de octubre de 2026 y en los flujos visibles del repositorio. No sustituyen la revisión jurídica ni prueban el comportamiento del backend en producción.
+
+1. **Responsable y domicilio.** Confirmar que «Academia, Distribuidora y Salón Brenn's» y Pl. de la Revolución Mexicana 5 son la identidad legal y el domicilio del responsable del tratamiento, además de la dirección comercial de recogida.
+2. **Datos conservados por el backend.** Auditar registro, sesiones, perfil, pedidos, citas, inscripciones y comprobantes: campos, retención, copias de seguridad y supresión. La app envía nombre, correo, teléfono y contraseña al registrarse, y comprobantes para pedidos y citas; no solicita domicilios de entrega.
+3. **Proveedores.** Identificar los proveedores que efectivamente acceden a datos personales y documentar si existe transferencia o tratamiento por encargo. No nombrar pasarelas de tarjeta sin evidencia.
+4. **Regla de cancelación.** Existe un PATCH a /api/citas. Se retiró el bloqueo móvil que calculaba 24 horas sólo con la fecha, porque podía impedir solicitudes válidas. Falta verificar la regla del servidor, la zona horaria, la hora exacta de la cita, los estados permitidos y el manejo de anticipos. La app no ofrece reprogramación.
+5. **Anticipo en cancelación oportuna.** No se indicó si se devuelve, acredita o conserva cuando se cancela con al menos 24 horas. Definirlo jurídicamente antes de aprobar la política; la app no procesa reembolsos automáticos.
+6. **Devoluciones y garantías.** Revisar la frase empresarial «la única excepción» y la atribución exclusiva a Brenn's de decidir reparación, reemplazo o reembolso. La LFPC reconoce derechos irrenunciables; el borrador preserva expresamente esos derechos y marca la redacción para revisión.
+7. **Condiciones de cursos.** El contrato verificado muestra título, descripción, precio, cupo y fechas, pero no condiciones particulares de cancelación. La inscripción sigue disponible con aviso de pendiente. La carga de comprobantes para cursos tampoco tiene un endpoint verificado; no se inventó uno.
+8. **Conservación y eliminación.** No hay endpoint seguro verificado para eliminar la cuenta. La pantalla sólo prepara un correo y no borra datos. Definir alcance, conservación legal, respuesta y trazabilidad del procedimiento.
+9. **Identidad en solicitudes ARCO.** La app sólo prepara un correo sin adjuntar identificación oficial. Definir un procedimiento seguro de verificación fuera de la app y de acreditación de representación, si corresponde.
+10. **Aprobación documental.** Obtener revisión jurídica, versión, fecha de aprobación, responsable legal confirmado y mecanismo de notificación antes de publicar los borradores como definitivos.
+
+**Otros puntos de producto:** comprobar que el servidor comunica de forma fiable cuándo un pedido está listo para recoger; confirmar el total definitivo antes de presentar cualquier costo adicional; definir un canal para comprobar pagos de cursos hasta que exista integración móvil. La aceptación de Términos se valida en el formulario, pero el contrato actual de /api/auth/register no guarda versión aceptada.
+
+Referencias normativas: [LFPDPPP vigente](https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf), en especial artículo 31 y definición de días; [LFPC vigente](https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPC.pdf).
