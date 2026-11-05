@@ -1,55 +1,92 @@
 name: Android Release - AAB y Tag
 
 on:
-  pull_request:
-    types: [closed]
-    branches: [main]
+  push:
+    branches:
+      - main
 
 permissions:
   contents: write
+  pull-requests: read
 
 jobs:
-  android-release:
-    name: Generar AAB y tag
-    if: ${{ github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release/v') && github.event.pull_request.head.repo.full_name == github.repository }}
+  verificar-release:
+    name: Verificar merge desde release
     runs-on: ubuntu-latest
 
+    outputs:
+      publicar: ${{ steps.verificar.outputs.publicar }}
+      version: ${{ steps.verificar.outputs.version }}
+
     steps:
-      - name: Obtener código
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.merge_commit_sha }}
-          fetch-depth: 0
+      - name: Obtener codigo
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Configurar Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
-          cache: npm
 
-      - name: Verificar versión
+      - name: Verificar origen del merge
+        id: verificar
         env:
-          RELEASE_BRANCH: ${{ github.event.pull_request.head.ref }}
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
+          echo "publicar=false" >> "$GITHUB_OUTPUT"
+
+          PRS=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/pulls")
+
+          RAMA=$(echo "$PRS" | jq -r --arg sha "$GITHUB_SHA" '
+            .[]
+            | select(
+                .merged_at != null
+                and .base.ref == "main"
+                and (.head.ref | startswith("release/v"))
+                and .merge_commit_sha == $sha
+              )
+            | .head.ref
+          ' | head -n 1)
+
+          if [[ -z "$RAMA" ]]; then
+            echo "No es un merge de release hacia main."
+            exit 0
+          fi
+
           VERSION=$(node -p "require('./app.json').expo.version")
 
-          if [[ "$RELEASE_BRANCH" != "release/v$VERSION" ]]; then
-            echo "La rama release no coincide con la versión"
+          if [[ "$RAMA" != "release/v$VERSION" ]]; then
+            echo "La rama release no coincide con app.json"
             exit 1
           fi
 
           if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" > /dev/null 2>&1; then
-            echo "El tag ya existe"
+            echo "El tag v$VERSION ya existe"
             exit 1
           fi
 
-          echo "RELEASE_VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "publicar=true" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Release verificada: v$VERSION"
 
-      - name: Configurar Expo y EAS
-        uses: expo/expo-github-action@v8
+  android-release:
+    name: Generar AAB y tag
+    needs: verificar-release
+    if: needs.verificar-release.outputs.publicar == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obtener codigo de main
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
 
       - name: Instalar dependencias
         run: npm ci
@@ -60,16 +97,25 @@ jobs:
       - name: Verificar TypeScript
         run: npm run typecheck
 
-      - name: Pruebas legacy
+      - name: Ejecutar pruebas legacy
         run: npm run test:legacy
 
-      - name: Pruebas Jest
+      - name: Ejecutar pruebas Jest
         run: npx jest --runInBand --testTimeout=20000
 
-      - name: Generar AAB
+      - name: Configurar Expo y EAS
+        uses: expo/expo-github-action@c7b66a9c327a43a8fa7c0158e7f30d6040d2481e # v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Generar AAB de produccion
         run: eas build --platform android --profile production --non-interactive --wait
 
-      - name: Crear tag automático
+      - name: Crear y subir tag automatico
+        env:
+          RELEASE_VERSION: ${{ needs.verificar-release.outputs.version }}
+        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
